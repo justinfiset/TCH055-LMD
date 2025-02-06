@@ -136,8 +136,10 @@ ORDER BY total_produit DESC;
 -- b) Pour faire suite à la requête a), faire une requête pour afficher les commandes
 -- constituées de plus d’un produit. Pour cette requête, afficher le numéro de la commande
 -- et le nombre de produits.
-
-
+SELECT no_commande, COUNT(*) as nb_produit
+FROM Commande_Produit
+GROUP BY no_commande
+HAVING COUNT(*) > 0;
 -- ************************************BLOC 5***********************************
 -- -----------------------------------------------------------------------------
 -- Requête 5.1 :
