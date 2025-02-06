@@ -115,24 +115,54 @@ WHERE quantite_stock = quantite_seuil;
 
 -- ************************************BLOC 5***********************************
 -- -----------------------------------------------------------------------------
--- Requête 5.1 :
+-- Requête 5.1 :Affichez la liste des clients qui ont réalisé au moins une commande. Pour cette requête,
+-- afficher le nom, le prénom, le téléphone et les attributs de l’adresse du client.
 -- -----------------------------------------------------------------------------
-
+SELECT c.nom, c.prenom, c.telephone, 
+       a.no_civique, a.nom_rue, a.ville, 
+       a.pays, a.code_postal
+FROM commande o
+JOIN client c ON c.no_client = o.no_client
+JOIN adresse a ON c.id_adresse = a.id_adresse
+GROUP BY c.no_client, c.nom, c.prenom, 
+         c.telephone, a.no_civique, 
+         a.nom_rue, a.ville, a.pays, 
+         a.code_postal
+HAVING COUNT(*) > 1;
 
 -- -----------------------------------------------------------------------------
--- Requête 5.2 :
+-- Requête 5.2 :Affichez les commandes de la semaine du 06 février au 12 février. Pour cette requête, afficher
+-- le numéro et la date de la commande, le nom, le prénom et le téléphone du client.
 -- -----------------------------------------------------------------------------
-
-
--- -----------------------------------------------------------------------------
--- Requête 5.3 : 
--- -----------------------------------------------------------------------------
-
+SELECT o.no_commande, o.date_commande, c.nom, c.prenom, c.telephone
+FROM commande o
+JOIN client c ON o.no_client = c.no_client
+WHERE o.date_commande between '2025/02/06' and '2025/02/12';
 
 -- -----------------------------------------------------------------------------
--- Requête 5.4 : 
+-- Requête 5.3 : Affichez chaque produit et ses fournisseurs. Pour cette requête, afficher la référence du
+-- produit, ainsi que le nom et le téléphone du fournisseur.
 -- -----------------------------------------------------------------------------
+SELECT p.ref_produit, f.nom_fournisseur, f.telephone
+FROM produit p
+JOIN produit_fournisseur j ON p.ref_produit = j.no_produit
+JOIN fournisseur f ON j.code_fournisseur = f.code_fournisseur
+/*AND p.code_fournisseur_prioritaire = f.code_fournisseur;*/
 
+/*PAS COMPLET*/
+
+-- -----------------------------------------------------------------------------
+-- Requête 5.4 : Lister les livraisons du mois de février 2025. Pour cette requête, afficher le numéro de la
+-- commande, le numéro de la livraison et la date de livraison. Afficher le résultat par ordre
+-- chronologique de la date de livraison.
+-- -----------------------------------------------------------------------------
+SELECT c.no_commande, l.no_livraison, l.date_livraison
+FROM livraison l
+JOIN livraison_commande_produit j ON l.no_livraison = j.no_livraison
+JOIN commande c ON c.no_commande = j.no_commande
+WHERE extract(month from l.date_livraison) = 2 
+  AND extract(year from l.date_livraison) = 2025
+ORDER BY l.date_livraison ASC;
 
 
 -- ************************************BLOC 6***********************************
