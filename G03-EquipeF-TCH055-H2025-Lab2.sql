@@ -89,30 +89,57 @@ WHERE quantite_stock = quantite_seuil;
 
 -- ************************************BLOC 4***********************************
 -- -----------------------------------------------------------------------------
--- Requête 4.1 :
+-- Requête 4.1 : Listez les informations des produits (le nom, la marque et le statut du produit) n’ayant jamais
+-- été commandés. Triez le résultat par nom de produit alphabétique.
 -- -----------------------------------------------------------------------------
-
-
+SELECT nom_produit,  marque, statut_produit
+FROM Produit
+WHERE ref_produit IN (
+                        SELECT ref_produit
+                        FROM Produit
+                        MINUS
+                        SELECT no_produit as ref_produit
+                        FROM Commande_Produit
+                    )
+ORDER BY nom_produit;
 -- -----------------------------------------------------------------------------
--- Requête 4.2 :
+-- Requête 4.2 : Listez la quantité (totale) commandée de chaque produit. Afficher le numéro de référence du
+-- produit, la marque, le nombre de fois que le produit est commandé et la quantité totale
+-- commandée. Trier le résultat par ordre croissant du numéro de référence du produit.
 -- -----------------------------------------------------------------------------
-
-
+SELECT no_produit, marque, nombre_commande, quantite_cmd
+FROM (
+      SELECT no_produit, COUNT(no_produit) as nombre_commande, SUM(quantite_cmd) as quantite_cmd
+      FROM Commande_Produit
+      GROUP BY no_produit
+     )
+INNER JOIN Produit ON no_produit = Produit.ref_produit
+ORDER BY no_produit;
 -- -----------------------------------------------------------------------------
--- Requête 4.3 :
+-- Requête 4.3 : Calculez la recette en espèces du mois de novembre : implémenter une requête qui
+-- détermine le total des paiements en espèces (CASH) pour le mois de novembre
 -- -----------------------------------------------------------------------------
-
-
+SELECT SUM(MONTANT) as recette_mois
+FROM Paiement
+WHERE type_paiement = 'CASH' AND extract(month from date_paiement) = 11;
 -- -----------------------------------------------------------------------------
 -- Requête 4.4 :
 -- -----------------------------------------------------------------------------
--- a)	
-
-
+-- a) Faites une requête pour afficher le nombre de produits (nombre d’items et non la quantité)
+-- pour chaque commande, trier le résultat par ordre décroissant du nombre de produits.
+-- Pour cette requête, affichez le numéro de la commande et le nombre produits
+SELECT no_commande, SUM(quantite_cmd) as total_produit
+FROM Commande_Produit
+GROUP BY no_commande
+ORDER BY total_produit DESC;
 -- -----------------------------------------------------------------------------
--- b)	
-
-
+-- b) Pour faire suite à la requête a), faire une requête pour afficher les commandes
+-- constituées de plus d’un produit. Pour cette requête, afficher le numéro de la commande
+-- et le nombre de produits.
+SELECT no_commande, COUNT(*) as nb_produit
+FROM Commande_Produit
+GROUP BY no_commande
+HAVING COUNT(*) > 0;
 -- ************************************BLOC 5***********************************
 -- -----------------------------------------------------------------------------
 -- Requête 5.1 :Affichez la liste des clients qui ont réalisé au moins une commande. Pour cette requête,
