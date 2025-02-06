@@ -170,13 +170,12 @@ WHERE o.date_commande between '2025/02/06' and '2025/02/12';
 -- Requête 5.3 : Affichez chaque produit et ses fournisseurs. Pour cette requête, afficher la référence du
 -- produit, ainsi que le nom et le téléphone du fournisseur.
 -- -----------------------------------------------------------------------------
-SELECT p.ref_produit, f.nom_fournisseur, f.telephone
+SELECT DISTINCT p.ref_produit, f.nom_fournisseur, f.telephone
 FROM produit p
 JOIN produit_fournisseur j ON p.ref_produit = j.no_produit
 JOIN fournisseur f ON j.code_fournisseur = f.code_fournisseur
-/*AND p.code_fournisseur_prioritaire = f.code_fournisseur;*/
-
-/*PAS COMPLET*/
+OR p.code_fournisseur_prioritaire = f.code_fournisseur
+ORDER BY p.ref_produit;
 
 -- -----------------------------------------------------------------------------
 -- Requête 5.4 : Lister les livraisons du mois de février 2025. Pour cette requête, afficher le numéro de la
