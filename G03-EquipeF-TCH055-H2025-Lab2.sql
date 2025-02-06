@@ -196,28 +196,33 @@ ORDER BY l.date_livraison ASC;
 -- Requête 6.1 :
 -- -----------------------------------------------------------------------------
 -- a)	
-
-
+CREATE OR REPLACE VIEW V_commande_item
+AS
+SELECT c.nom, c.prenom, co.no_commande, quantite_cmd, prix_unitaire, statut
+FROM Commande_Produit
+INNER JOIN Commande co ON Commande_Produit.no_commande = co.no_commande
+INNER JOIN Client c ON co.no_client = c.no_client
+INNER JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit;
 -- -----------------------------------------------------------------------------
 -- b)	
-
-
-
+SELECT * 
+FROM V_commande_item;
 -- -----------------------------------------------------------------------------
 -- c)	
-
-
-
+SELECT V_commande_item.*, (quantite_cmd * prix_unitaire) AS Prix_Total_Item
+FROM V_commande_item
+WHERE LOWER(prenom) = LOWER('Michel') -- Ici on vérifie sans tenir compte de la case
+AND LOWER(nom) = LOWER('Tremblay');   -- Ainsi, peut importe l'entrée on trouve tous les items
 -- -----------------------------------------------------------------------------
 -- d)	
-
-
-
+SELECT V_commande_item.*, (quantite_cmd * prix_unitaire) AS Prix_Total_Item
+FROM V_commande_item
+WHERE no_commande = 30;
 -- -----------------------------------------------------------------------------
 -- e)	
-
-
-
+SELECT sum(quantite_cmd * prix_unitaire) AS total_commande
+FROM V_commande_item
+WHERE no_commande = 30;
 -- -----------------------------------------------------------------------------
 -- Requête 6.2 :
 -- -----------------------------------------------------------------------------
