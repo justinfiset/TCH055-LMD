@@ -70,27 +70,50 @@ WHERE ROWNUM=1;
 -- -----------------------------------------------------------------------------
 -- Requête 3.1 :
 -- -----------------------------------------------------------------------------
-
+SELECT DISTINCT c.nom AS e_nom, c.prenom AS e_prenom, c.no_client
+FROM Client c
+JOIN Commande co ON c.no_client = co.no_client
+JOIN Commande_Produit cp ON co.no_commande = cp.no_commande
+JOIN Produit p ON cp.no_produit = p.ref_produit
+WHERE p.marque = 'DELL';
 
 -- -----------------------------------------------------------------------------
 -- Requête 3.2 :
 -- -----------------------------------------------------------------------------
-
+SELECT p.nom_produit, p.marque, p.prix_unitaire
+FROM Produit p
+ORDER BY p.prix_unitaire ASC, p.nom_produit ASC;
 
 -- -----------------------------------------------------------------------------
 -- Requête 3.3:
 -- -----------------------------------------------------------------------------
-
+SELECT c.statut, COUNT(*) AS nombre_commandes
+FROM Commande c
+GROUP BY c.statut
+ORDER BY nombre_commandes DESC;
 
 -- -----------------------------------------------------------------------------
 -- REQUËTE 3.4 
 -- -----------------------------------------------------------------------------
-
+SELECT f.id_facture, SUM(p.montant) AS total_paiements
+FROM Facture f
+JOIN Paiement p ON f.id_facture = p.id_facture
+GROUP BY f.id_facture
+ORDER BY f.id_facture ASC;
 
 -- -----------------------------------------------------------------------------
 -- Requête 3.5 :
 -- -----------------------------------------------------------------------------
-
+SELECT l.no_livraison, l.date_livraison, 
+       c.nom AS nom_client, c.prenom AS prenom_client, c.telephone,
+       a.nom_rue, a.ville, a.code_postal, a.pays
+FROM Livraison l
+JOIN livraison_commande_produit lcp ON l.no_livraison = lcp.no_livraison
+JOIN Commande_produit cp ON  lcp.no_commande = cp.no_commande
+JOIN Commande co ON cp.no_commande= co.no_commande
+JOIN Client c ON co.no_client = c.no_client
+JOIN Adresse a ON c.id_adresse = a.id_adresse
+ORDER BY l.no_livraison ASC;
 
 -- ************************************BLOC 4***********************************
 -- -----------------------------------------------------------------------------
