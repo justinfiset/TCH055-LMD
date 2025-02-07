@@ -42,9 +42,14 @@ FROM Produit
 WHERE quantite_stock = quantite_seuil;
 -- ************************************BLOC 2***********************************
 -- -----------------------------------------------------------------------------
--- Requête 2.1 :
+-- Requête 2.1 : Retrouver le type de paiement le plus utilisé par les clients.
 -- -----------------------------------------------------------------------------
 
+SELECT *
+FROM ( SELECT paiement.type_paiement
+       FROM paiement
+       ORDER BY paiement.type_paiement)
+WHERE ROWNUM=1;
 
 -- -----------------------------------------------------------------------------
 -- Requête 2.2 :
