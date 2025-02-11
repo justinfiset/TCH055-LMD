@@ -15,7 +15,7 @@ FROM Produit;
 -- Requête 1.2 : Lister les produits (nom et prix unitaire) des produits
 -- qui sont en promotion
 -- -----------------------------------------------------------------------------
-SELECT nom_produit, prix_unitaire,
+SELECT nom_produit, prix_unitaire
 FROM Produit
 WHERE id_promotion IS NOT NULL;
 -- -----------------------------------------------------------------------------
@@ -46,9 +46,9 @@ WHERE quantite_stock = quantite_seuil;
 -- -----------------------------------------------------------------------------
 
 SELECT *
-FROM ( SELECT paiement.type_paiement
-       FROM paiement
-       ORDER BY paiement.type_paiement)
+FROM ( SELECT type_paiement
+       FROM Paiement
+       ORDER BY type_paiement)
 WHERE ROWNUM=1;
 
 -- -----------------------------------------------------------------------------
@@ -57,14 +57,24 @@ WHERE ROWNUM=1;
 
 
 -- -----------------------------------------------------------------------------
--- Requête 2.3 :
+-- Requête 2.3 : Lister les différentes catégories en indiquant le nom de la super catégorie si elle existe. 
 -- -----------------------------------------------------------------------------
 
-
+SELECT nom_categorie, nom_categorie_mere
+FROM Categorie;
 -- -----------------------------------------------------------------------------
--- Requête 2.4 :
+-- Requête 2.4 :Afficher les prix réduits des produits en promotion. Pour cette requête, afficher pour chaque 
+-- produit en promotion, le nom du produit, le prix unitaire, le montant de la promotion (le 
+-- pourcentage), le montant de la réduction et le prix réduit. Trier le résultat par nom de produit 
+-- et afficher les montants avec 2 chiffres après la virgule.  
 -- -----------------------------------------------------------------------------
 
+SELECT produit.nom_produit, produit.prix_unitaire, promotion.reduction AS reduc_pourcentage, 
+(produit.prix_unitaire * (promotion.reduction/100))AS reductionPrix
+,( produit.prix_unitaire -(produit.prix_unitaire * (promotion.reduction/100)))AS prix_Reduit
+FROM produit, promotion
+WHERE produit.id_promotion = promotion.id_promotion
+ORDER BY produit.nom_produit;
 
 -- ************************************BLOC 3***********************************
 -- -----------------------------------------------------------------------------
