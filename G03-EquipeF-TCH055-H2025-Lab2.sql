@@ -55,7 +55,16 @@ WHERE ROWNUM=1;
 -- Requête 2.2 :
 -- -----------------------------------------------------------------------------
 
-
+SELECT nom,prenom, no_civique, nom_rue, ville, pays,code_postal
+FROM  Client
+JOIN Adresse ON Client.id_adresse = Adresse.id_adresse
+WHERE Adresse.id_adresse IN 
+    (SELECT  Adresse.id_adresse
+     FROM Client
+     JOIN Adresse ON Client.id_adresse = Adresse.id_adresse
+     GROUP BY Adresse.id_adresse 
+     HAVING COUNT(Client.id_adresse)>1);
+     
 -- -----------------------------------------------------------------------------
 -- Requête 2.3 : Lister les différentes catégories en indiquant le nom de la super catégorie si elle existe. 
 -- -----------------------------------------------------------------------------
