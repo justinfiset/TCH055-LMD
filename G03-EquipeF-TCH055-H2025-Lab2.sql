@@ -289,5 +289,17 @@ FROM (
 WHERE ROWNUM = 1;
 -- -----------------------------------------------------------------------------
 -- c)	
-
+SELECT l.no_client, l.nom, l.prenom, c.date_commande, c.statut, p.no_commande, p.max_nb_items
+FROM (
+        SELECT no_commande, max_nb_items
+        FROM (
+                SELECT no_commande, SUM(quantite_cmd) AS max_nb_items
+                FROM commande_produit
+                GROUP BY no_commande
+                ORDER BY max_nb_items DESC
+             ) 
+        WHERE ROWNUM = 1
+     ) p
+JOIN commande c ON c.no_commande = p.no_commande
+JOIN client l ON c.no_client = l.no_client
 
