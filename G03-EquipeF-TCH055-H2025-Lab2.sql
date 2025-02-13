@@ -273,13 +273,20 @@ WHERE no_commande = 30;
 -- -----------------------------------------------------------------------------
 -- Requête 6.2 :
 -- -----------------------------------------------------------------------------
--- a)	
-
-
+-- a)
+SELECT MAX(SUM(quantite_cmd)) as max_nb_items
+FROM commande_produit
+GROUP BY no_commande;
 -- -----------------------------------------------------------------------------
 -- b)	
-
-
+SELECT no_commande, max_nb_items
+FROM (
+    SELECT no_commande, SUM(quantite_cmd) AS max_nb_items
+    FROM commande_produit
+    GROUP BY no_commande
+    ORDER BY max_nb_items DESC
+)
+WHERE ROWNUM = 1;
 -- -----------------------------------------------------------------------------
 -- c)	
 
