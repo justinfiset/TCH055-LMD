@@ -79,8 +79,8 @@ FROM Categorie;
 -- -----------------------------------------------------------------------------
 
 SELECT produit.nom_produit, produit.prix_unitaire, promotion.reduction AS reduc_pourcentage, 
-(produit.prix_unitaire * (promotion.reduction/100))AS reductionPrix
-,( produit.prix_unitaire -(produit.prix_unitaire * (promotion.reduction/100)))AS prix_Reduit
+ROUND((produit.prix_unitaire * (promotion.reduction/100)),2)AS reductionPrix
+,ROUND(( produit.prix_unitaire -(produit.prix_unitaire * (promotion.reduction/100))),2)AS prix_Reduit
 FROM produit, promotion
 WHERE produit.id_promotion = promotion.id_promotion
 ORDER BY produit.nom_produit;
