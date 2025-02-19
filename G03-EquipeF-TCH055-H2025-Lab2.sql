@@ -45,12 +45,14 @@ WHERE quantite_stock = quantite_seuil;
 -- Requête 2.1 : Retrouver le type de paiement le plus utilisé par les clients.
 -- -----------------------------------------------------------------------------
 
-SELECT *
-FROM ( SELECT type_paiement
-       FROM Paiement
-       ORDER BY type_paiement)
+SELECT type_paiement
+FROM (
+        SELECT type_paiement, COUNT(*) AS cpt
+        FROM Paiement
+        GROUP BY type_paiement
+        ORDER BY cpt DESC
+     )
 WHERE ROWNUM=1;
-
 -- -----------------------------------------------------------------------------
 -- Requête 2.2 :
 -- -----------------------------------------------------------------------------
@@ -87,9 +89,9 @@ ORDER BY produit.nom_produit;
 
 -- ************************************BLOC 3***********************************
 -- -----------------------------------------------------------------------------
--- Requête 3.1 :
+-- Requête 3.1 :Trouvez les clients (nom et prénom) qui ont commandé les produits de la marque ‘DELL’.
 -- -----------------------------------------------------------------------------
-SELECT DISTINCT c.nom AS e_nom, c.prenom AS e_prenom, c.no_client
+SELECT DISTINCT c.nom, c.prenom, c.no_client
 FROM Client c
 JOIN Commande co ON c.no_client = co.no_client
 JOIN Commande_Produit cp ON co.no_commande = cp.no_commande
@@ -97,14 +99,17 @@ JOIN Produit p ON cp.no_produit = p.ref_produit
 WHERE p.marque = 'DELL';
 
 -- -----------------------------------------------------------------------------
--- Requête 3.2 :
+-- Requête 3.2 :Affichez les produits (nom, marque, prix unitaire) par ordre croissant de prix et ordre croissant
+-- de nom.
 -- -----------------------------------------------------------------------------
 SELECT p.nom_produit, p.marque, p.prix_unitaire
 FROM Produit p
 ORDER BY p.prix_unitaire ASC, p.nom_produit ASC;
 
 -- -----------------------------------------------------------------------------
--- Requête 3.3:
+-- Requête 3.3 :Affichez le nombre de commande pour chaque statut (ENCOURS, ANNULEE ou FERMEE).
+-- Pour cette requête, afficher le statut et le nombre de commandes correspondants par ordre
+-- décroissant de nombre de commande.
 -- -----------------------------------------------------------------------------
 SELECT c.statut, COUNT(*) AS nombre_commandes
 FROM Commande c
@@ -112,7 +117,8 @@ GROUP BY c.statut
 ORDER BY nombre_commandes DESC;
 
 -- -----------------------------------------------------------------------------
--- REQUËTE 3.4 
+-- REQUËTE 3.4 : Afficher pour chaque facture le total des paiements effectués : afficher l’identifiant de la
+-- facture et le total de ses paiements, par ordre croissant de l’identifiant.
 -- -----------------------------------------------------------------------------
 SELECT f.id_facture, SUM(p.montant) AS total_paiements
 FROM Facture f
@@ -121,7 +127,10 @@ GROUP BY f.id_facture
 ORDER BY f.id_facture ASC;
 
 -- -----------------------------------------------------------------------------
--- Requête 3.5 :
+-- Requête 3.5 : Affichez les informations du client et l’adresse pour chaque livraison. Pour cette requête,
+-- afficher le numéro et la date de livraison, le nom, le prénom et le numéro de téléphone du
+-- client, ainsi que l’adresse de livraison (toutes les composantes de l’adresse). Triez par ordre
+-- croissant du numéro de livraison. 
 -- -----------------------------------------------------------------------------
 SELECT l.no_livraison, l.date_livraison, 
        c.nom AS nom_client, c.prenom AS prenom_client, c.telephone,
@@ -132,6 +141,9 @@ JOIN Commande_produit cp ON  lcp.no_commande = cp.no_commande
 JOIN Commande co ON cp.no_commande= co.no_commande
 JOIN Client c ON co.no_client = c.no_client
 JOIN Adresse a ON c.id_adresse = a.id_adresse
+GROUP BY l.no_livraison, l.date_livraison, 
+       c.nom, c.prenom, c.telephone,
+       a.nom_rue, a.ville, a.code_postal, a.pays
 ORDER BY l.no_livraison ASC;
 
 -- ************************************BLOC 4***********************************
@@ -242,7 +254,10 @@ ORDER BY l.date_livraison ASC;
 -- -----------------------------------------------------------------------------
 -- Requête 6.1 :
 -- -----------------------------------------------------------------------------
--- a)	
+-- a)	Créez une vue nommé V_commande_item qui retrouve les items de toutes les
+-- commandes (de tous les clients). Cette vue est composée des colonnes suivantes : le
+-- nom et le prénom du client, le numéro de la commande, la quantité commandée, le prix
+-- unitaire du produit et le statut de la commande.
 CREATE OR REPLACE VIEW V_commande_item
 AS
 SELECT c.nom, c.prenom, co.no_commande, quantite_cmd, prix_unitaire, statut
@@ -251,34 +266,38 @@ INNER JOIN Commande co ON Commande_Produit.no_commande = co.no_commande
 INNER JOIN Client c ON co.no_client = c.no_client
 INNER JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit;
 -- -----------------------------------------------------------------------------
--- b)	
+-- b)	Testez votre vue.
 SELECT * 
 FROM V_commande_item;
 -- -----------------------------------------------------------------------------
--- c)	
+-- c)	Utilisez la vue V_commande_item pour afficher tous les items de toutes les commandes
+-- du client « Michel Tremblay ».
 SELECT V_commande_item.*, (quantite_cmd * prix_unitaire) AS Prix_Total_Item
 FROM V_commande_item
 WHERE LOWER(prenom) = LOWER('Michel') -- Ici on vérifie sans tenir compte de la case
 AND LOWER(nom) = LOWER('Tremblay');   -- Ainsi, peut importe l'entrée on trouve tous les items
 -- -----------------------------------------------------------------------------
--- d)	
+-- d)	Utilisez la vue V_commande_item pour afficher les items de la commande numéro 30. 
 SELECT V_commande_item.*, (quantite_cmd * prix_unitaire) AS Prix_Total_Item
 FROM V_commande_item
 WHERE no_commande = 30;
 -- -----------------------------------------------------------------------------
--- e)	
+-- e)	Utilisez la vue pour afficher le montant total de la commande numéro 30.
 SELECT sum(quantite_cmd * prix_unitaire) AS total_commande
 FROM V_commande_item
 WHERE no_commande = 30;
 -- -----------------------------------------------------------------------------
 -- Requête 6.2 :
 -- -----------------------------------------------------------------------------
--- a)
+-- a) Écrire une requête qui retourne le plus grand nombre d’items (de produit) parmi toutes
+-- les commandes. Cette requête affiche uniquement le nombre d’items.
+
 SELECT MAX(SUM(quantite_cmd)) as max_nb_items
 FROM commande_produit
 GROUP BY no_commande;
 -- -----------------------------------------------------------------------------
--- b)	
+-- b)	Écrire une requête qui donne le numéro de la commande qui contient le plus d’items.
+-- Indication : vous pouvez utiliser la requête a) comme une sous-requête. 
 SELECT no_commande, max_nb_items
 FROM (
     SELECT no_commande, SUM(quantite_cmd) AS max_nb_items
@@ -288,7 +307,9 @@ FROM (
 )
 WHERE ROWNUM = 1;
 -- -----------------------------------------------------------------------------
--- c)	
+-- c)	Écrire une requête pour déterminer la commande qui contient le plus d’items. Pour cette
+-- requête, afficher le numéro, la date et le statut de la commande ainsi que le numéro du client
+-- qui a passé cette commande, son nom et son prénom.
 SELECT l.no_client, l.nom, l.prenom, c.date_commande, c.statut, p.no_commande, p.max_nb_items
 FROM (
         SELECT no_commande, max_nb_items
