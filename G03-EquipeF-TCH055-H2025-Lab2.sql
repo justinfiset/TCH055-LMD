@@ -322,5 +322,5 @@ FROM (
         WHERE ROWNUM = 1
      ) p
 JOIN commande c ON c.no_commande = p.no_commande
-JOIN client l ON c.no_client = l.no_client
+JOIN client l ON c.no_client = l.no_client;
 
