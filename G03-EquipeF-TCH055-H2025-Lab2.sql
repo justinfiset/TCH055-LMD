@@ -46,7 +46,6 @@ WHERE quantite_stock = quantite_seuil;
 -- -----------------------------------------------------------------------------
 -- Requête 2.1 : Retrouver le type de paiement le plus utilisé par les clients.
 -- -----------------------------------------------------------------------------
-
 SELECT type_paiement
 FROM (
         SELECT type_paiement, COUNT(*) AS cpt
@@ -56,7 +55,7 @@ FROM (
      )
 WHERE ROWNUM=1;
 -- -----------------------------------------------------------------------------
--- Requête 2.2 :
+-- Requête 2.2 : Retrouvez la liste des clients (nom et prénom) qui ont la même adresse.
 -- -----------------------------------------------------------------------------
 
 SELECT nom,prenom, no_civique, nom_rue, ville, pays,code_postal
@@ -72,7 +71,6 @@ WHERE Adresse.id_adresse IN
 -- -----------------------------------------------------------------------------
 -- Requête 2.3 : Lister les différentes catégories en indiquant le nom de la super catégorie si elle existe. 
 -- -----------------------------------------------------------------------------
-
 SELECT nom_categorie, nom_categorie_mere
 FROM Categorie;
 -- -----------------------------------------------------------------------------
@@ -189,7 +187,7 @@ WHERE type_paiement = 'CASH' AND extract(month from date_paiement) = 11;
 -- a) Faites une requête pour afficher le nombre de produits (nombre d’items et non la quantité)
 -- pour chaque commande, trier le résultat par ordre décroissant du nombre de produits.
 -- Pour cette requête, affichez le numéro de la commande et le nombre produits
-SELECT no_commande, SUM(quantite_cmd) as total_produit
+SELECT no_commande, COUNT(*) as total_produit
 FROM Commande_Produit
 GROUP BY no_commande
 ORDER BY total_produit DESC;
@@ -216,7 +214,7 @@ GROUP BY c.no_client, c.nom, c.prenom,
          c.telephone, a.no_civique, 
          a.nom_rue, a.ville, a.pays, 
          a.code_postal
-HAVING COUNT(*) > 1;
+HAVING COUNT(*) > 0;
 
 -- -----------------------------------------------------------------------------
 -- Requête 5.2 :Affichez les commandes de la semaine du 06 février au 12 février. Pour cette requête, afficher
@@ -225,8 +223,7 @@ HAVING COUNT(*) > 1;
 SELECT o.no_commande, o.date_commande, c.nom, c.prenom, c.telephone
 FROM commande o
 JOIN client c ON o.no_client = c.no_client
-WHERE o.date_commande between '2025/02/06' and '2025/02/12';
-
+WHERE o.date_commande BETWEEN TO_DATE('2025/02/06', 'YYYY/MM/DD') AND TO_DATE('2025/02/12', 'YYYY/MM/DD');
 -- -----------------------------------------------------------------------------
 -- Requête 5.3 : Affichez chaque produit et ses fournisseurs. Pour cette requête, afficher la référence du
 -- produit, ainsi que le nom et le téléphone du fournisseur.
