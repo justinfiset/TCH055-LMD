@@ -80,12 +80,12 @@ FROM Categorie;
 -- et afficher les montants avec 2 chiffres après la virgule.  
 -- -----------------------------------------------------------------------------
 
-SELECT produit.nom_produit, produit.prix_unitaire, promotion.reduction AS reduc_pourcentage, 
-(produit.prix_unitaire * (promotion.reduction/100))AS reductionPrix
-,( produit.prix_unitaire -(produit.prix_unitaire * (promotion.reduction/100)))AS prix_Reduit
-FROM produit, promotion
-WHERE produit.id_promotion = promotion.id_promotion
-ORDER BY produit.nom_produit;
+SELECT nom_produit, prix_unitaire, reduction AS reduc_pourcentage, 
+ROUND((prix_unitaire * (reduction/100)),2)AS reductionPrix
+,ROUND(( prix_unitaire -(prix_unitaire * (reduction/100))),2)AS prix_Reduit
+FROM Produit, Promotion
+WHERE Produit.id_promotion = Promotion.id_promotion
+ORDER BY nom_produit;
 
 -- ************************************BLOC 3***********************************
 -- -----------------------------------------------------------------------------
