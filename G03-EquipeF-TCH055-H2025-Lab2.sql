@@ -73,7 +73,7 @@ WHERE Adresse.id_adresse IN
 -- Requête 2.3 : Lister les différentes catégories en indiquant le nom de la super catégorie si elle existe. 
 -- -----------------------------------------------------------------------------
 
-SELECT nom_categorie, nom_categorie_mere
+SELECT nom_categorie, nom_categorie_mere AS super_categorie
 FROM Categorie;
 -- -----------------------------------------------------------------------------
 -- Requête 2.4 :Afficher les prix réduits des produits en promotion. Pour cette requête, afficher pour chaque 
