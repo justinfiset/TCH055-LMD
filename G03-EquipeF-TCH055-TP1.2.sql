@@ -13,7 +13,6 @@ CREATE TABLE Cours (
     
     -- Contrainte de clé primaire
     CONSTRAINT PK_Cours PRIMARY KEY (sigle)
-    CHECK 
 );
 
 ----------------------------------------------
@@ -37,7 +36,7 @@ CREATE TABLE Prealable (
 CREATE TABLE SessionETS (
     code_session NUMBER(2) NOT NULL,
     date_debut DATE NOT NULL,
-    date_fin DATE NOT NULL
+    date_fin DATE NOT NULL,
     
     -- Contrainte de clé primaire
     CONSTRAINT PK_SessoinETS PRIMARY KEY (code_session)
