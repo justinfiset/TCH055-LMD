@@ -57,7 +57,8 @@ CREATE TABLE CoursGroupe (
     CONSTRAINT PK_CoursGroupe PRIMARY KEY (sigle, no_groupe, code_session),
     
     -- Contrainte de clé étrangère
-    CONSTRAINT FK_Sigle FOREIGN KEY (sigle) REFERENCES Cours,
+    CONSTRAINT FK_Sigle FOREIGN KEY (sigle) REFERENCES Cours
+    ON DELETE CASCADE,
     CONSTRAINT FK_CodeSession FOREIGN KEY (code_session) REFERENCES SessionETS,
     CONSTRAINT FK_CodeProfesseur FOREIGN KEY (code_professeur) REFERENCES Professeur
 );
