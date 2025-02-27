@@ -102,10 +102,10 @@ CREATE TABLE Etudiant(
 ---- Création de la table inscription
 ----------------------------------------------
 CREATE TABLE Inscription(
-    code_permanent  VARCHAR2(12)   NOT NULL REFERENCES Etudiant(code_permanent),
-    sigle           VARCHAR2(6)    NOT NULL REFERENCES CoursGroupe(sigle),
-    no_groupe       NUMBER(2)      NOT NULL REFERENCES CoursGroupe(no_groupe),
-    code_session    NUMBER(2)      NOT NULL REFERENCES CoursGroupe(code_session),
+    code_permanent  VARCHAR2(12)   NOT NULL,
+    sigle           VARCHAR2(6)    NOT NULL,
+    no_groupe       NUMBER(2)      NOT NULL,
+    code_session    NUMBER(2)      NOT NULL,
     date_inscrition DATE           NOT NULL,
     date_abandon    DATE           NULL,
     note            NUMBER(3)      NULL ,
