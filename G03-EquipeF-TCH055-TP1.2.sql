@@ -1,3 +1,4 @@
+
 -- TCH055 - LABORATOIRE 1 PARTIE 2
 -- SCRIPT DE CREATION DU MODELE PHYSIQUE DE DONNES
 -- AUTEUR : JUSTIN FISET
@@ -59,7 +60,8 @@ CREATE TABLE CoursGroupe (
     CONSTRAINT PK_CoursGroupe PRIMARY KEY (sigle, no_groupe, code_session),
     
     -- Contrainte de clé étrangère
-    CONSTRAINT FK_Sigle FOREIGN KEY (sigle) REFERENCES Cours,
+    CONSTRAINT FK_Sigle FOREIGN KEY (sigle) REFERENCES Cours
+    ON DELETE CASCADE,
     CONSTRAINT FK_CodeSession FOREIGN KEY (code_session) REFERENCES SessionETS,
     CONSTRAINT FK_CodeProfesseur FOREIGN KEY (code_professeur) REFERENCES Professeur
 );
@@ -74,4 +76,47 @@ CREATE TABLE Professeur (
     
     -- Contrainte de clé primaire
     CONSTRAINT PK_CodeProfesseur PRIMARY KEY (code_professeur)
+);
+
+
+
+/*
+Création de la table Etudiant
+*/
+
+DROP TABLE Etudiant CASCADE CONSTRAINT;
+DROP TABLE Inscription CASCADE CONSTRAINT;
+
+
+CREATE TABLE Etudiant(
+    code_permanent VARCHAR2(12)  NOT NULL,
+    nom            VARCHAR2(20)  NOT NULL,
+    prenom         VARCHAR2(20)  NOT NULL,
+    code_programme NUMBER(3)     NULL,
+    --Contrainte ce clée primaire de la table Etudiant
+    CONSTRAINT PK_Etudiant       PRIMARY KEY(code_permanent)
+);
+
+/*
+Création de la table inscrition
+*/
+CREATE TABLE Inscription(
+    code_permanent  VARCHAR2(12)   NOT NULL REFERENCES Etudiant(code_permanent),
+    sigle           VARCHAR2(6)    NOT NULL REFERENCES CoursGroupe(sigle),
+    no_groupe       NUMBER(2)      NOT NULL REFERENCES CoursGroupe(no_groupe),
+    code_session    NUMBER(2)      NOT NULL REFERENCES CoursGroupe(code_session),
+    date_inscrition DATE           NOT NULL,
+    date_abandon    DATE           NULL,
+    note            NUMBER(3)      NULL ,
+
+    --Contraintes des clées primaires--
+    CONSTRAINT PK_Inscription      PRIMARY KEY (code_permanent,sigle,no_groupe,code_session),
+    --Contraintes des clées étrangères primaires venant de la table CoursGroupe--
+    CONSTRAINT FK_CoursGroupe      FOREIGN KEY (sigle,no_groupe,code_session) 
+    REFERENCES CoursGroupe(sigle,no_groupe,code_session) 
+    ON DELETE CASCADE,
+     --Contraintes des clées étrangères primaires venant de la table Etudiant--
+    CONSTRAINT FR_Etudiant         FOREIGN KEY (code_permanent) 
+    REFERENCES Etudiant(code_permanent)
+    ON DELETE CASCADE
 );
