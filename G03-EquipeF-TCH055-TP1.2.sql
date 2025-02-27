@@ -20,7 +20,11 @@ CREATE TABLE Cours (
     nb_credits NUMBER(2) NOT NULL,
     
     -- Contrainte de clé primaire
-    CONSTRAINT PK_Cours PRIMARY KEY (sigle)
+    CONSTRAINT PK_Cours PRIMARY KEY (sigle),
+    
+    -- Contrainte de sigle de cours, doit être constitué de 
+    -- 3 lettres et de 3 chiffres (Exemple : TCH055)
+    CONSTRAINT CH_Sigle CHECK (REGEXP_LIKE(sigle, '^[A-Z]{3}[0-9]{3}$'))
 );
 
 ----------------------------------------------
