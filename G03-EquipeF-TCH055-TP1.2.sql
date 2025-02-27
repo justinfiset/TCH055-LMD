@@ -20,11 +20,11 @@ CREATE TABLE Cours (
     nb_credits NUMBER(2) NOT NULL,
     
     -- Contrainte de clé primaire
-    CONSTRAINT PK_Cours PRIMARY KEY (sigle),
+    CONSTRAINT PK_C_Cours PRIMARY KEY (sigle),
     
     -- Contrainte de sigle de cours, doit être constitué de 
     -- 3 lettres et de 3 chiffres (Exemple : TCH055)
-    CONSTRAINT CH_Sigle CHECK (REGEXP_LIKE(sigle, '^[A-Z]{3}[0-9]{3}$'))
+    CONSTRAINT CH_C_Sigle CHECK (REGEXP_LIKE(sigle, '^[A-Z]{3}[0-9]{3}$'))
 );
 
 ----------------------------------------------
@@ -35,11 +35,11 @@ CREATE TABLE Prealable (
     sigle_prealable VARCHAR(6),
     
     -- Contrainte de clé primaire
-    CONSTRAINT PK_Prealable PRIMARY KEY (sigle, sigle_prealable),
+    CONSTRAINT PK_P_Prealable PRIMARY KEY (sigle, sigle_prealable),
     
     -- Contrainte de clé étrangère
-    CONSTRAINT FK_Sigle FOREIGN KEY (sigle) REFERENCES Cours,
-    CONSTRAINT FK_SiglePrealable FOREIGN KEY (sigle_prealable) REFERENCES Cours
+    CONSTRAINT FK_P_Sigle FOREIGN KEY (sigle) REFERENCES Cours,
+    CONSTRAINT FK_P_SiglePrealable FOREIGN KEY (sigle_prealable) REFERENCES Cours
 );
 
 ----------------------------------------------
@@ -51,7 +51,7 @@ CREATE TABLE SessionETS (
     date_fin DATE NOT NULL,
     
     -- Contrainte de clé primaire
-    CONSTRAINT PK_SessoinETS PRIMARY KEY (code_session)
+    CONSTRAINT PK_SessionETS PRIMARY KEY (code_session)
 );
 
 ----------------------------------------------
@@ -68,10 +68,10 @@ CREATE TABLE CoursGroupe (
     CONSTRAINT PK_CoursGroupe PRIMARY KEY (sigle, no_groupe, code_session),
     
     -- Contrainte de clé étrangère
-    CONSTRAINT FK_Sigle FOREIGN KEY (sigle) REFERENCES Cours
+    CONSTRAINT FK_CG_Sigle FOREIGN KEY (sigle) REFERENCES Cours
     ON DELETE CASCADE,
-    CONSTRAINT FK_CodeSession FOREIGN KEY (code_session) REFERENCES SessionETS,
-    CONSTRAINT FK_CodeProfesseur FOREIGN KEY (code_professeur) REFERENCES Professeur
+    CONSTRAINT FK_CG_CodeSession FOREIGN KEY (code_session) REFERENCES SessionETS,
+    CONSTRAINT FK_CG_CodeProfesseur FOREIGN KEY (code_professeur) REFERENCES Professeur
 );
 
 ----------------------------------------------
@@ -83,7 +83,7 @@ CREATE TABLE Professeur (
     prenom VARCHAR2(20) NOT NULL,
     
     -- Contrainte de clé primaire
-    CONSTRAINT PK_CodeProfesseur PRIMARY KEY (code_professeur)
+    CONSTRAINT PK_P_CodeProfesseur PRIMARY KEY (code_professeur)
 );
 
 ----------------------------------------------
@@ -95,7 +95,7 @@ CREATE TABLE Etudiant(
     prenom         VARCHAR2(20)  NOT NULL,
     code_programme NUMBER(3)     NULL,
     --Contrainte ce clée primaire de la table Etudiant
-    CONSTRAINT PK_Etudiant       PRIMARY KEY(code_permanent)
+    CONSTRAINT PK_E_Etudiant       PRIMARY KEY(code_permanent)
 );
 
 ----------------------------------------------
@@ -113,11 +113,11 @@ CREATE TABLE Inscription(
     --Contraintes des clées primaires--
     CONSTRAINT PK_Inscription      PRIMARY KEY (code_permanent,sigle,no_groupe,code_session),
     --Contraintes des clées étrangères primaires venant de la table CoursGroupe--
-    CONSTRAINT FK_CoursGroupe      FOREIGN KEY (sigle,no_groupe,code_session) 
+    CONSTRAINT FK_I_CoursGroupe      FOREIGN KEY (sigle,no_groupe,code_session) 
     REFERENCES CoursGroupe(sigle,no_groupe,code_session) 
     ON DELETE CASCADE,
      --Contraintes des clées étrangères primaires venant de la table Etudiant--
-    CONSTRAINT FR_Etudiant         FOREIGN KEY (code_permanent) 
+    CONSTRAINT FR_I_Etudiant         FOREIGN KEY (code_permanent) 
     REFERENCES Etudiant(code_permanent)
     ON DELETE CASCADE
 );
