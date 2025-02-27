@@ -3,6 +3,14 @@
 -- SCRIPT DE CREATION DU MODELE PHYSIQUE DE DONNES
 -- AUTEUR : JUSTIN FISET
 
+DROP TABLE Etudiant CASCADE CONSTRAINT;
+DROP TABLE Inscription CASCADE CONSTRAINT;
+DROP TABLE Cours CASCADE CONSTRAINT;
+DROP TABLE Prealable CASCADE CONSTRAINT;
+DROP TABLE SessionETS CASCADE CONSTRAINT;
+DROP TABLE CoursGroupe CASCADE CONSTRAINT;
+DROP TABLE Professeur CASCADE CONSTRAINT;
+
 ----------------------------------------------
 ---- Creation de la table Cours
 ----------------------------------------------
@@ -74,16 +82,9 @@ CREATE TABLE Professeur (
     CONSTRAINT PK_CodeProfesseur PRIMARY KEY (code_professeur)
 );
 
-
-
-/*
-Création de la table Etudiant
-*/
-
-DROP TABLE Etudiant CASCADE CONSTRAINT;
-DROP TABLE Inscription CASCADE CONSTRAINT;
-
-
+----------------------------------------------
+---- Création de la table Etudiant
+----------------------------------------------
 CREATE TABLE Etudiant(
     code_permanent VARCHAR2(12)  NOT NULL,
     nom            VARCHAR2(20)  NOT NULL,
@@ -93,9 +94,9 @@ CREATE TABLE Etudiant(
     CONSTRAINT PK_Etudiant       PRIMARY KEY(code_permanent)
 );
 
-/*
-Création de la table inscrition
-*/
+----------------------------------------------
+---- Création de la table inscription
+----------------------------------------------
 CREATE TABLE Inscription(
     code_permanent  VARCHAR2(12)   NOT NULL REFERENCES Etudiant(code_permanent),
     sigle           VARCHAR2(6)    NOT NULL REFERENCES CoursGroupe(sigle),
