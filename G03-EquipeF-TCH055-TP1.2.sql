@@ -120,3 +120,35 @@ CREATE TABLE Inscription(
     REFERENCES Etudiant(code_permanent)
     ON DELETE CASCADE
 );
+---------------------------------------------------------------------------------------------------------
+-------------------------------------INSERTION DE DONNÉES------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+
+----------------------------------------
+---- Création des cours d'automne
+----------------------------------------
+INSERT INTO Cours (sigle, titre, nb_credits)
+VALUES ('AUT01', 'BD', 2),
+       ('AUT02', 'Mobile', 3),
+       ('AUT03', 'Web', 4),
+       ('AUT01', 'Architecture', 3),
+       ('AUT01', 'Français', 2);
+       
+----------------------------------------
+---- Création de la session d'automne
+----------------------------------------
+INSERT INTO SessionETS (code_session, date_debut, date_fin)
+VALUES (1, TO_DATE('2024-09-02', 'YYYY-MM-DD'), TO_DATE('2024-12-20', 'YYYY-MM-DD'));
+
+----------------------------------------
+---- Création des professeurs
+----------------------------------------
+INSERT INTO Professeur (code_professeur, nom, prenom)
+VALUES  (1, 'Dhillon', 'Sally'),
+        (2, 'Carrier', 'Christiane'),
+        (3, 'Cooper', 'Sue'),
+        (4, 'Silva', 'Nicola'),
+        (5, 'Fuller', 'Leslie'),
+        (6, 'Bruce', 'Josephine'),
+        (7, 'Bell', 'Garth'),
+        (8, 'Best', 'Jocelyn');
