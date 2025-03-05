@@ -24,6 +24,7 @@ VALUES ('COM121', 'Français 2', 2);
 
 INSERT INTO Cours (sigle, titre, nb_credits)
 VALUES ('LOG320', 'Programmation avancé', 3);
+
 ----------------------------------------
 ---- Création des sessions
 ----------------------------------------
@@ -127,7 +128,7 @@ INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
 VALUES ('A1B20', 'Laporte', 'Matthew', 204);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B21', 'Lewis', 'Lawrence', 204);
+VALUES ('A1B21', 'Lewis', 'Lawrence', 203);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
 VALUES ('A1B22', 'Bolduc', 'Gregory', 202);
@@ -136,7 +137,7 @@ INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
 VALUES ('A1B23', 'Dumais', 'Deb', 204);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B24', 'Fleury', 'Roxanne', 204);
+VALUES ('A1B24', 'Fleury', 'Roxanne', 201);
 
 ----------------------------------------
 ---- Création des groupes
@@ -168,6 +169,7 @@ VALUES ('COM121', 1, 2, 45, 'PROF7');
 INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
 VALUES ('LOG320', 1, 2, 50, 'PROF8');
 
+-- On a un cours qui a déjà été donné à la session d'automne
 INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
 VALUES ('TCH057', 1, 2, 40, 'PROF3');
 
@@ -192,5 +194,26 @@ VALUES ('LOG320', 'TCH055');
 ----------------------------------------
 ---- Création des Inscription
 ----------------------------------------
+-- INSCRIPTIONS POUR LA SESSION H2024
+-- Cours 1
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ();
 
+-- Cours 2
+-- Cours 3
+-- Cours 4
+-- Cours 5
 
+-- INSCRIPTIONS POUR LA SESSION H2025
+-- Cours 1
+-- Cours 2
+-- Cours 3
+-- Cours 4
+
+----------------------------------------
+---- Création des groupes pour les cours
+----------------------------------------
+
+----------------------------------------
+---- Gestion des abansons
+----------------------------------------
