@@ -477,5 +477,5 @@ WHERE sigle = (
       AND date_abandon IS NOT NULL
     GROUP BY sigle
     HAVING COUNT(*) = 2
-)
+);
 
