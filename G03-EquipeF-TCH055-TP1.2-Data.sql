@@ -55,12 +55,6 @@ VALUES ('PROF5', 'Fuller', 'Leslie');
 INSERT INTO Professeur (code_professeur, nom, prenom) 
 VALUES ('PROF6', 'Bruce', 'Josephine');
 
-INSERT INTO Professeur (code_professeur, nom, prenom) 
-VALUES ('PROF7', 'Bell', 'Garth');
-
-INSERT INTO Professeur (code_professeur, nom, prenom) 
-VALUES ('PROF8', 'Best', 'Jocelyn');
-
 ----------------------------------------
 ---- Création des étudiants
 ----------------------------------------
@@ -116,62 +110,62 @@ INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
 VALUES ('A1B17', 'Knight', 'Alison', 204);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B17', 'Dubois', 'Martine', 203);
+VALUES ('A1B18', 'Dubois', 'Martine', 203);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
-VALUES ('A1B18', 'Hudson', 'Sandi', 202);
+VALUES ('A1B19', 'Hudson', 'Sandi', 202);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B19', 'Cloutier', 'Remi', 202);
+VALUES ('A1B20', 'Cloutier', 'Remi', 202);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B20', 'Laporte', 'Matthew', 204);
+VALUES ('A1B21', 'Laporte', 'Matthew', 204);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B21', 'Lewis', 'Lawrence', 203);
+VALUES ('A1B22', 'Lewis', 'Lawrence', 203);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B22', 'Bolduc', 'Gregory', 202);
+VALUES ('A1B23', 'Bolduc', 'Gregory', 202);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B23', 'Dumais', 'Deb', 204);
+VALUES ('A1B24', 'Dumais', 'Deb', 204);
 
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme) 
-VALUES ('A1B24', 'Fleury', 'Roxanne', 201);
+VALUES ('A1B25', 'Fleury', 'Roxanne', 201);
 
 ----------------------------------------
 ---- Création des groupes
 ----------------------------------------
 -- SESSION AUTOMNE 2024
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
 VALUES ('TCH055', 1, 1, 50, 'PROF1');
 
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
 VALUES ('TCH056', 1, 1, 40, 'PROF2');
 
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
 VALUES ('TCH057', 1, 1, 35, 'PROF3');
 
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
 VALUES ('COM100', 1, 1, 55, 'PROF4');
 
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
 VALUES ('TCH017', 1, 1, 35, 'PROF1'); -- Le deuxîême cours donnée par le même professeur pour la session A24
 
 -- SESSION HIVERS 2025
 -- Les cours sont données par 4 prof différentes mais 2 sont des anciens de la session d'automne.
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
-VALUES ('TCH099', 1, 2, 45, 'PROF1');
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
+VALUES ('TCH099', 1, 2, 45, 'PROF2'); -- Un des deux cours qui sont donner par un professeur pour la session A24
 
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
-VALUES ('COM121', 1, 2, 45, 'PROF7');
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
+VALUES ('COM121', 1, 2, 45, 'PROF5');
 
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
-VALUES ('LOG320', 1, 2, 50, 'PROF8');
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
+VALUES ('LOG320', 1, 2, 50, 'PROF6');
 
 -- On a un cours qui a déjà été donné à la session d'automne
-INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscription, code_professeur)
-VALUES ('TCH057', 1, 2, 40, 'PROF3');
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
+VALUES ('TCH057', 1, 2, 40, 'PROF3'); -- Deuxieme des deux cours qui sont donner par un professeur pour la session A24
 
 ----------------------------------------
 ---- Création des Préalable
@@ -195,17 +189,185 @@ VALUES ('LOG320', 'TCH055');
 ---- Création des Inscription
 ----------------------------------------
 -- INSCRIPTIONS POUR LA SESSION H2024
--- Cours 1
+-- Cours 1(10 inscription avec aucun abandon)
 INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
-VALUES ();
+VALUES ('A1B01', 'TCH055', 1, 1, 2024/09/02, NULL, 81);
 
--- Cours 2
--- Cours 3
--- Cours 4
--- Cours 5
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B02', 'TCH055', 1, 1, 2024/09/02, NULL, 56);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B03', 'TCH055', 1, 1, 2024/09/02, NULL, 87);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B04', 'TCH055', 1, 1, 2024/09/02, NULL, 84);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B05', 'TCH055', 1, 1, 2024/09/02, NULL, 59);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B06', 'TCH055', 1, 1, 2024/09/02, NULL, 92);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B07', 'TCH055', 1, 1, 2024/09/02, NULL, 48);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B08', 'TCH055', 1, 50, 2024/09/02, NULL, 74);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B09', 'TCH055', 1, 1, 2024/09/02, NULL, 68);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES ('A1B10', 'TCH055', 1, 1, 2024/09/02, NULL, 56);
+
+-- Cours 2(10 inscription avec aucun abandon)
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B10', 'TCH056', 1, 1, 2024/09/02, NULL, 31);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B11', 'TCH056', 1, 1, 2024/09/02, NULL, 64);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B12', 'TCH056', 1, 1, 2024/09/02, NULL, 89);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B13', 'TCH056', 1, 1, 2024/09/02, NULL, 37);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B14', 'TCH056', 1, 1, 2024/09/02, NULL, 49);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B15', 'TCH056', 1, 1, 2024/09/02, NULL, 56);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B16', 'TCH056', 1, 1, 2024/09/02, NULL, 76);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B07', 'TCH056', 1, 1, 2024/09/02, NULL, 100);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B08', 'TCH056', 1, 1, 2024/09/02, NULL, 95);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B09', 'TCH056', 1, 1, 2024/09/02, NULL, 55);
+-- Cours 3(10 inscription avec 2 abandon, ALB12 et ALB13)
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B01', 'TCH057', 1, 1, 2024/09/02, NULL, 68);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B03', 'TCH057', 1, 1, 2024/09/02, NULL, 36);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B06', 'TCH057', 1, 1, 2024/09/02, NULL, 60);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B07', 'TCH057', 1, 1, 2024/09/02, NULL, 58);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B10', 'TCH057', 1, 1, 2024/09/02, NULL, 78);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B11', 'TCH057', 1, 1, 2024/09/02, NULL, 84);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B15', 'TCH057', 1, 1, 2024/09/02, NULL, 91);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B14', 'TCH057', 1, 1, 2024/09/02, NULL, 51);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B13', 'TCH057', 1, 1, 2024/09/02, 2024/11/24, NULL);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B12', 'TCH057', 1, 1, 2024/09/02, 2024/12/06, NULL);
+
+-- Cours 4(15 inscription avec 5 abandons)
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B02', 'COM100', 1, 1, 2024/09/02, NULL, 61);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B03', 'COM100', 1, 1, 2024/09/02, NULL, 51);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B04', 'COM100', 1, 1, 2024/09/02, NULL, 40);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B05', 'COM100', 1, 1, 2024/09/02, NULL, 68);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B06', 'COM100', 1, 1, 2024/09/02, 2024/10/02, NULL);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B07', 'COM100', 1, 1, 2024/09/02, 2024/09/26, NULL);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B08', 'COM100', 1, 1, 2024/09/02, 2024/09/15, NULL);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B09', 'COM100', 1, 1, 2024/09/02, 2024/10/19, NULL);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B10', 'COM100', 1, 1, 2024/09/02, 2024/09/19, NULL);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B11', 'COM100', 1, 1, 2024/09/02, NULL, 85);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B12', 'COM100', 1, 1, 2024/09/02, NULL, 77);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B13', 'COM100', 1, 1, 2024/09/02, NULL, 90);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B14', 'COM100', 1, 1, 2024/09/02, NULL, 49);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B15', 'COM100', 1, 1, 2024/09/02, NULL, 44);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B16', 'COM100', 1, 1, 2024/09/02, NULL, 76);
+
+-- Cours 5(12 inscription avec aucun abandon)
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B03', 'TCH017', 1, 1, 2024/09/02, NULL, 51);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B04', 'TCH017', 1, 1, 2024/09/02, NULL, 40);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B05', 'TCH017', 1, 1, 2024/09/02, NULL, 68);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B06', 'TCH017', 1, 1, 2024/09/02, NULL, 78);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B07', 'TCH017', 1, 1, 2024/09/02, NULL, 45);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B08', 'TCH017', 1, 1, 2024/09/02, NULL, 43);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B09', 'TCH017', 1, 1, 2024/09/02, NULL, 77);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B10', 'TCH017', 1, 1, 2024/09/02, NULL, 99);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B11', 'TCH017', 1, 1, 2024/09/02, NULL, 41);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B12', 'TCH017', 1, 1, 2024/09/02, NULL, 79);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B13', 'TCH017', 1, 1, 2024/09/02, NULL, 72);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B14', 'TCH017', 1, 1, 2024/09/02, NULL, 91);
 
 -- INSCRIPTIONS POUR LA SESSION H2025
--- Cours 1
+-- Cours 1(8 inscription avec aucun abandon)
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES();
 -- Cours 2
 -- Cours 3
 -- Cours 4
