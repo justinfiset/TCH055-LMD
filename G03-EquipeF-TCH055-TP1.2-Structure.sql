@@ -104,7 +104,7 @@ CREATE TABLE Inscription(
     sigle           VARCHAR2(6)    NOT NULL,
     no_groupe       NUMBER(2)      NOT NULL,
     code_session    NUMBER(2)      NOT NULL,
-    date_inscrition DATE           NOT NULL,
+    date_inscription DATE           NOT NULL,
     date_abandon    DATE           NULL,
     note            NUMBER(3)      NULL ,
 
