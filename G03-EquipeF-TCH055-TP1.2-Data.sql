@@ -481,3 +481,67 @@ WHERE sigle = (
     GROUP BY sigle
     HAVING COUNT(*) = 2
 );
+
+----------------------------------------
+---- Jeux de tests pour chacune des contraintesz
+----------------------------------------
+-- CETTE SECTION NE CONTIENT QUE DES INSERTIONS INVALIDES, LES INSERTIONS VALIDES SONT PRÉSENTÉ CI-HAUT
+-- AVEC LE JEUX D'INSERTION QUI CORRESPOND À L'ÉNONCÉ, LES REQUÊTES CI-DESSOUS SONT DES INSERTIONS INVALIDES
+-- ELLES NE DEVRAIT DONC DONNER QUE DES ERREURS !
+
+-- Contrainte 1 : Le sigle d'un cours doit être constitué de 3 lettres et de 3 chiffres (Ex: TCH055)
+-- On tente d'insérer un cours avec un sigle invalide, il y a un chiffre en trop
+INSERT INTO Cours (sigle, titre, nb_credits)
+VALUES ('TCH0555', 'Ce cours sera invalide, il y a un chiffre de trop', 3);
+
+-- On tente d'inser un cours avec une lettre en trop dans le sigle
+INSERT INTO Cours (sigle, titre, nb_credits)
+VALUES ('TCH055A', 'Ce cours sera invalide, il y a une lettre de trop', 3);
+
+-- On tente d'inserer un cours avec un espace dans le sigle
+INSERT INTO Cours (sigle, titre, nb_credits)
+VALUES ('TCH 055', 'Ce cours sera invalide, il y a un espace dans le sigle', 3);
+
+-- Contrainte 2 : Les informations suivantes d'un étudiant ne peuvent être null : son nom et son prénom
+-- Avec un nom null
+INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
+VALUES ('A1B26', NULL, 'John', 201);
+
+-- Avec un prénom null
+INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
+VALUES ('A1B27', 'Doe', NULL, 201);
+
+-- Contrainte 3 : Les informations suivantes d'une session ne peuvnet être nulles : la date de début et la date de fin
+-- Avec une date de début null
+INSERT INTO Session (code_session, date_debut, date_fin)
+VALUES (3, NULL, TO_DATE('01-01-2025', 'DD-MM-YYYY'));
+
+-- Avec une date de fin null
+INSERT INTO Session (code_session, date_debut, date_fin)
+VALUES (4, TO_DATE('01-01-2025', 'DD-MM-YYYY'), NULL);
+
+-- Contrainte 4 : La suppresion d'un cours à une session entraine la supperession de toutes les inscriptions à ce cours pour ladite session
+-- ATTENTION, PUISQUE LA CONTRAINTE UTILISE UN PROFESSEUR ET UNE SESSION EXISTANTE, IL VAUT MIEUX EXECUTER LE SCRIPT ENTIER AVANT D'EXECUTER LIGNE PAR LIGNE CE JEUX DE TESTS
+-- On va reprendre l'exemple de la session H2025, on va supprimer le cours LOG320,
+INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
+VALUES ('LOG320', 1, 2, 50, 'PROF6');
+
+-- On met que 2 inscriptions pour simplement démontrer le bon fonctionnement de la contrainte
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B08', 'LOG320', 1, 2, TO_DATE('02-12-2024','DD-MM-YYYY' ), NULL, 73);
+
+INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
+VALUES('A1B09', 'LOG320', 1, 2, TO_DATE('10-12-2024','DD-MM-YYYY' ), NULL, 64);
+
+-- On montre que les deux insciptions existent bien
+SELECT * FROM Inscription
+WHERE sigle = 'LOG320';
+
+-- Supression du cours pour la session
+DELETE FROM CoursGroupe
+WHERE sigle = 'LOG320'
+AND code_session = 2; -- Pour la session h25
+
+-- On montre que les inscriptions ne sont plus présentes
+SELECT * FROM Inscription
+WHERE sigle = 'LOG320';
