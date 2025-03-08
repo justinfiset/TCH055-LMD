@@ -40,6 +40,7 @@ CREATE TABLE Prealable (
     CONSTRAINT FK_P_Sigle           FOREIGN KEY (sigle)           REFERENCES Cours
     ON DELETE CASCADE,
     CONSTRAINT FK_P_SiglePrealable  FOREIGN KEY (sigle_prealable) REFERENCES Cours
+    ON DELETE CASCADE
 );
 
 ----------------------------------------------

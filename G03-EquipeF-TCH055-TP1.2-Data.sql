@@ -467,10 +467,6 @@ INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_in
 VALUES('A1B25', 'TCH057', 1, 2, TO_DATE('06-01-2025','DD-MM-YYYY' ), NULL, 41);
 
 ----------------------------------------
----- Création des groupes pour les cours
-----------------------------------------
-
-----------------------------------------
 ---- Gestion des abandons
 ----------------------------------------
 DELETE FROM CoursGroupe 
