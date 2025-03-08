@@ -212,7 +212,7 @@ INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_in
 VALUES ('A1B07', 'TCH055', 1, 1, TO_DATE('02-09-2024','DD-MM-YYYY' ), NULL, 48);
 
 INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
-VALUES ('A1B08', 'TCH055', 1, 50, TO_DATE('02-09-2024','DD-MM-YYYY' ), NULL, 74);
+VALUES ('A1B08', 'TCH055', 1, 1, TO_DATE('02-09-2024','DD-MM-YYYY' ), NULL, 74);
 
 INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
 VALUES ('A1B09', 'TCH055', 1, 1, TO_DATE('02-09-2024','DD-MM-YYYY' ), NULL, 68);
