@@ -1,3 +1,7 @@
+DELETE FROM Cours;
+DELETE FROM Etudiant;
+DELETE FROM Professeur;
+DELETE FROM SessionETS;
 ----------------------------------------
 ---- Création des cours d'automne
 ----------------------------------------

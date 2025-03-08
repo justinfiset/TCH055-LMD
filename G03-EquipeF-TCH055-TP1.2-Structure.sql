@@ -37,7 +37,8 @@ CREATE TABLE Prealable (
     CONSTRAINT PK_P_Prealable PRIMARY KEY (sigle, sigle_prealable),
     
     -- Contrainte de clé étrangère
-    CONSTRAINT FK_P_Sigle           FOREIGN KEY (sigle)           REFERENCES Cours,
+    CONSTRAINT FK_P_Sigle           FOREIGN KEY (sigle)           REFERENCES Cours
+    ON DELETE CASCADE,
     CONSTRAINT FK_P_SiglePrealable  FOREIGN KEY (sigle_prealable) REFERENCES Cours
 );
 
@@ -80,7 +81,8 @@ CREATE TABLE CoursGroupe (
     -- Contrainte de clé étrangère
     CONSTRAINT FK_CG_Sigle          FOREIGN KEY (sigle)           REFERENCES Cours
     ON DELETE CASCADE,
-    CONSTRAINT FK_CG_CodeSession    FOREIGN KEY (code_session)    REFERENCES SessionETS,
+    CONSTRAINT FK_CG_CodeSession    FOREIGN KEY (code_session)    REFERENCES SessionETS
+    ON DELETE CASCADE,
     CONSTRAINT FK_CG_CodeProfesseur FOREIGN KEY (code_professeur) REFERENCES Professeur
 );
 
