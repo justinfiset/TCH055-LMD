@@ -172,7 +172,7 @@ INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_
 VALUES ('TCH057', 1, 2, 40, 'PROF3'); -- Deuxieme des deux cours qui sont donner par un professeur pour la session A24
 
 ----------------------------------------
----- Création des Préalable
+---- Création des Préalables
 ----------------------------------------
 -- PRÉALABLES POUR LES SESSION H25
 -- Le cours 1 et 2 ont uniquement un préalable qui a été donnée à la session A24
@@ -190,7 +190,7 @@ INSERT INTO Prealable (sigle, sigle_prealable)
 VALUES ('LOG320', 'TCH055');
 
 ----------------------------------------
----- Création des Inscription
+---- Création des Inscriptions
 ----------------------------------------
 -- INSCRIPTIONS POUR LA SESSION H2024
 -- Cours 1(10 inscription avec aucun abandon)
@@ -370,7 +370,7 @@ INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_in
 VALUES('A1B14', 'TCH017', 1, 1, TO_DATE('24-04-2024','DD-MM-YYYY'), NULL, 91);
 
 
--- INSCRIPTIONS POUR LA SESSION H2025
+-- INSCRIPTIONS POUR LA SESSION H2025 --
 -- Cours 1, 1 prealable(8 inscription avec aucun abandon)
 INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
 VALUES('A1B18', 'TCH099', 1, 2, TO_DATE('27-11-2024','DD-MM-YYYY' ), NULL, 63);
@@ -470,7 +470,7 @@ VALUES('A1B25', 'TCH057', 1, 2, TO_DATE('08-12-2024','DD-MM-YYYY' ), NULL, 41);
 
 
 ----------------------------------------
----- Gestion des abandons
+---- Gestion des abandons --------------
 ----------------------------------------
 DELETE FROM CoursGroupe 
 WHERE sigle = (
@@ -482,9 +482,9 @@ WHERE sigle = (
     HAVING COUNT(*) = 2
 );
 
-----------------------------------------
----- Jeux de tests pour chacune des contraintesz
-----------------------------------------
+----------------------------------------------------
+---- Jeux de tests pour chacune des contraintes ----
+----------------------------------------------------
 -- CETTE SECTION NE CONTIENT QUE DES INSERTIONS INVALIDES, LES INSERTIONS VALIDES SONT PRÉSENTÉ CI-HAUT
 -- AVEC LE JEUX D'INSERTION QUI CORRESPOND À L'ÉNONCÉ, LES REQUÊTES CI-DESSOUS SONT DES INSERTIONS INVALIDES
 -- ELLES NE DEVRAIT DONC DONNER QUE DES ERREURS !
@@ -498,7 +498,7 @@ VALUES ('TCH0555', 'Ce cours sera invalide, il y a un chiffre de trop', 3);
 INSERT INTO Cours (sigle, titre, nb_credits)
 VALUES ('TCH055A', 'Ce cours sera invalide, il y a une lettre de trop', 3);
 
--- On tente d'inserer un cours avec un espace dans le sigle
+-- On tente d'insérer un cours avec un espace dans le sigle
 INSERT INTO Cours (sigle, titre, nb_credits)
 VALUES ('TCH 055', 'Ce cours sera invalide, il y a un espace dans le sigle', 3);
 
@@ -511,7 +511,7 @@ VALUES ('A1B26', NULL, 'John', 201);
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
 VALUES ('A1B27', 'Doe', NULL, 201);
 
--- Contrainte 3 : Les informations suivantes d'une session ne peuvnet être nulles : la date de début et la date de fin
+-- Contrainte 3 : Les informations suivantes d'une session ne peuvent être nulles : la date de début et la date de fin
 -- Avec une date de début null
 INSERT INTO Session (code_session, date_debut, date_fin)
 VALUES (3, NULL, TO_DATE('01-01-2025', 'DD-MM-YYYY'));
