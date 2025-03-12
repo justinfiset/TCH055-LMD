@@ -493,55 +493,71 @@ WHERE sigle = (
 -- On tente d'insérer un cours avec un sigle invalide, il y a un chiffre en trop
 INSERT INTO Cours (sigle, titre, nb_credits)
 VALUES ('TCH0555', 'Ce cours sera invalide, il y a un chiffre de trop', 3);
+-- Erreur SQL : ORA-12899: value too large for column "TPBD2"."COURS"."SIGLE" (actual: 7, maximum: 6)
 
 -- On tente d'inser un cours avec une lettre en trop dans le sigle
 INSERT INTO Cours (sigle, titre, nb_credits)
 VALUES ('TCH055A', 'Ce cours sera invalide, il y a une lettre de trop', 3);
+-- Erreur SQL : ORA-12899: value too large for column "TPBD2"."COURS"."SIGLE" (actual: 7, maximum: 6)
 
 -- On tente d'insérer un cours avec un espace dans le sigle
 INSERT INTO Cours (sigle, titre, nb_credits)
 VALUES ('TCH 055', 'Ce cours sera invalide, il y a un espace dans le sigle', 3);
+-- Erreur SQL : ORA-12899: value too large for column "TPBD2"."COURS"."SIGLE" (actual: 7, maximum: 6)
 
 -- Contrainte 2 : Les informations suivantes d'un étudiant ne peuvent être null : son nom et son prénom
 -- Avec un nom null
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
 VALUES ('A1B26', NULL, 'John', 201);
+-- Erreur SQL : ORA-01400: cannot insert NULL into ("TPBD2"."ETUDIANT"."NOM")
 
 -- Avec un prénom null
 INSERT INTO Etudiant (code_permanent, nom, prenom, code_programme)
 VALUES ('A1B27', 'Doe', NULL, 201);
+-- Erreur SQL : ORA-01400: cannot insert NULL into ("TPBD2"."ETUDIANT"."PRENOM")
 
 -- Contrainte 3 : Les informations suivantes d'une session ne peuvent être nulles : la date de début et la date de fin
 -- Avec une date de début null
 INSERT INTO sessionets (code_session, date_debut, date_fin)
 VALUES (3, NULL, TO_DATE('01-01-2025', 'DD-MM-YYYY'));
+-- Erreur SQL : ORA-01400: cannot insert NULL into ("TPBD2"."SESSIONETS"."DATE_DEBUT")
 
 -- Avec une date de fin null
 INSERT INTO sessionets (code_session, date_debut, date_fin)
 VALUES (4, TO_DATE('01-01-2025', 'DD-MM-YYYY'), NULL);
+-- Erreur SQL : ORA-01400: cannot insert NULL into ("TPBD2"."SESSIONETS"."DATE_FIN")
 
 -- Contrainte 4 : La suppresion d'un cours à une session entraine la supperession de toutes les inscriptions à ce cours pour ladite session
 -- ATTENTION, PUISQUE LA CONTRAINTE UTILISE UN PROFESSEUR ET UNE SESSION EXISTANTE, IL VAUT MIEUX EXECUTER LE SCRIPT ENTIER AVANT D'EXECUTER LIGNE PAR LIGNE CE JEUX DE TESTS
 -- On va reprendre l'exemple de la session H2025, on va supprimer le cours LOG320,
 INSERT INTO CoursGroupe (sigle, no_groupe, code_session, max_inscriptions, code_professeur)
 VALUES ('LOG320', 1, 2, 50, 'PROF6');
+-- 1 ligne inséré.
 
 -- On met que 2 inscriptions pour simplement démontrer le bon fonctionnement de la contrainte
 INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
 VALUES('A1B08', 'LOG320', 1, 2, TO_DATE('02-12-2024','DD-MM-YYYY' ), NULL, 73);
+-- 1 ligne inséré.
 
 INSERT INTO Inscription (code_permanent, sigle, no_groupe, code_session, date_inscription, date_abandon, note)
 VALUES('A1B09', 'LOG320', 1, 2, TO_DATE('10-12-2024','DD-MM-YYYY' ), NULL, 64);
+-- 1 ligne inséré.
 
 -- On montre que les deux insciptions existent bien
 SELECT * FROM Inscription
 WHERE sigle = 'LOG320';
+-- CODE_PERMANE SIGLE   NO_GROUPE CODE_SESSION DATE_INS DATE_ABA       NOTE
+-- ------------ ------ ---------- ------------ -------- -------- ----------
+-- A1B08        LOG320          1            2 24-12-02                  73
+-- A1B09        LOG320          1            2 24-12-10                  64
 
 -- Supression du cours pour la session
 DELETE FROM CoursGroupe
 WHERE sigle = 'LOG320'
 AND code_session = 2; -- Pour la session h25
+-- 1 ligne supprimé.
 
 -- On montre que les inscriptions ne sont plus présentes
 SELECT * FROM Inscription
 WHERE sigle = 'LOG320';
+-- aucune ligne sélectionnée
