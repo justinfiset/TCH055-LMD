@@ -513,11 +513,11 @@ VALUES ('A1B27', 'Doe', NULL, 201);
 
 -- Contrainte 3 : Les informations suivantes d'une session ne peuvent être nulles : la date de début et la date de fin
 -- Avec une date de début null
-INSERT INTO Session (code_session, date_debut, date_fin)
+INSERT INTO sessionets (code_session, date_debut, date_fin)
 VALUES (3, NULL, TO_DATE('01-01-2025', 'DD-MM-YYYY'));
 
 -- Avec une date de fin null
-INSERT INTO Session (code_session, date_debut, date_fin)
+INSERT INTO sessionets (code_session, date_debut, date_fin)
 VALUES (4, TO_DATE('01-01-2025', 'DD-MM-YYYY'), NULL);
 
 -- Contrainte 4 : La suppresion d'un cours à une session entraine la supperession de toutes les inscriptions à ce cours pour ladite session
