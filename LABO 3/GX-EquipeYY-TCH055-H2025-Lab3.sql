@@ -28,7 +28,28 @@
 -- -----------------------------------------------------------------------------
 -- Question 4
 -- -----------------------------------------------------------------------------
-
+CREATE OR REPLACE FUNCTION f_quantite_deja_livree
+(ref_produit Livraison_Commande_Produit.no_produit%TYPE,
+ ref_commande Livraison_Commande_Produit.no_commande%TYPE)
+RETURN Livraison_Commande_Produit.quantite_livree%TYPE 
+IS
+    quant_liv Livraison_Commande_Produit.quantite_livree%TYPE;
+BEGIN
+    SELECT l.quantite_livree
+    INTO quant_liv
+    FROM Livraison_Commande_Produit l
+    WHERE l.no_produit=ref_produit
+        AND l.no_commande=ref_commande;
+    
+    RETURN quant_liv;
+        
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        quant_liv := -1;
+        RETURN quant_liv;
+        
+END;
+/ 
 
 -- -----------------------------------------------------------------------------
 -- Question 5
