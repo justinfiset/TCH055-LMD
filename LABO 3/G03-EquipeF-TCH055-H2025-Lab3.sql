@@ -39,7 +39,32 @@ CREATE OR REPLACE TRIGGER TRG_qte_stock
 -- -----------------------------------------------------------------------------
 -- Question 3-A
 -- -----------------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER TRG_stat_vente
+AFTER INSERT
+ON Livraison_Commande_Produit
 
+FOR EACH ROW
+DECLARE
+    nb_stat NUMBER(10);
+    date_livraison DATE := SYSDATE;
+BEGIN
+    -- Vérification si la statistique existe
+    SELECT COUNT(*)
+    INTO nb_stat
+    FROM Statistique_Vente 
+    WHERE ref_produit = :NEW.no_produit;
+    
+IF nb_stat > 0 THEN
+    UPDATE Statistique_Vente
+    SET quantite_vendue = quantite_vendue + :NEW.quantite_livree
+    WHERE Statistique_Vente.ref_produit = :NEW.no_produit;
+ELSE
+    INSERT INTO Statistique_Vente(ref_produit, code_mois, quantite_vendue)
+    VALUES (:NEW.no_produit, extract(month FROM date_livraison), :NEW.quantite_livree);
+END IF;
+
+END;
+/
 
 -- -----------------------------------------------------------------------------
 -- Question 3-B
