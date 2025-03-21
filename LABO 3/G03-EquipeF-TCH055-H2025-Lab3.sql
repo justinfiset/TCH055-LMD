@@ -34,8 +34,35 @@ CREATE OR REPLACE TRIGGER TRG_qte_stock
 -- -----------------------------------------------------------------------------
 -- Question 2
 -- -----------------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER trg_auto_approvisionnement
+AFTER UPDATE ON Produit
+FOR EACH ROW
+WHEN (NEW.quantite_stock < NEW.quantite_seuil)
+DECLARE
+    v_count NUMBER;
+    v_fournisseur_id NUMBER;
+BEGIN
+    -- verifier si une commande en cours existe deja
+    SELECT COUNT(*) INTO v_count
+    FROM Approvisionnement
+    WHERE no_produit = :NEW.ref_produit 
+    AND statut = 'ENCOURS';
 
+    -- si aucune commande en cours, creer une nouvelle
+    IF v_count = 0 THEN
+        -- Sélectionner le fournisseur prioritaire
+        SELECT code_fournisseur INTO v_fournisseur_id
+        FROM Produit_Fournisseur
+        WHERE no_produit = :NEW.ref_produit
+        AND ROWNUM = 1
+        ORDER BY code_fournisseur ASC;
 
+        -- inserer la nouvelle commande
+        INSERT INTO Approvisionnement (no_produit, code_fournisseur, quantite_approvis, date_cmd_approvis, statut)
+        VALUES (:NEW.ref_produit, v_fournisseur_id, ROUND(:NEW.quantite_seuil * 1.1), SYSDATE, 'ENCOURS');
+    END IF;
+END;
+/
 -- -----------------------------------------------------------------------------
 -- Question 3-A
 -- -----------------------------------------------------------------------------
