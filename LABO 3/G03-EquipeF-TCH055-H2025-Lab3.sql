@@ -15,21 +15,54 @@
 --Note : Pour simplification, on ne traite pas les modifications dans la quantité à livrer, car dans ce cas, 
 --la mise à jour de la quantité en stock est différente.
 -------------------------------------------------------------------------------------
---Création du TRIGGER qui permet de détecter si le stock est inférieur à zéro. Si oui,
---il renvoie une exception , sinon il fait rien.
+--
+--DECLENCHEUR: TRG_qte_stock
+--TABLE: Commande_Produit
+--TYPE: En même temps qu'une mise à jours
+--DESCRIPTION:
+-- Vérifie si le stock du produit n'est pas inférieur à zéro. Si la quantité du stock n'est pas 
+--suffisante le déclencheur lève une exception nommée E_STOCK_INSUFFISANT. Si la quantité du stock 
+--est suffisante il va avoir une insertion d'un tuple dans la table Livraison_Commande_Produit.
+--
+--
 --------------------------------------------------------------------------------------
-CREATE OR REPLACE TRIGGER TRG_qte_stock
-        AFTER UPDATE ON produit
-        FOR EACH ROW 
-        BEGIN     
-            --Si la quantité en stock est inférieur à zéro, on lève l'exception E_STOCK_INSUFISANT, sinon on fait rien--
-             IF produit.quantite_sock<0 THEN
-                RAISE E_STOCK_INSUFFISANT;
-                ROLLBACK; 
-             END IF;
-        END;
-/
+CREATE OR REPLACE TRIGGER TRG_qte_stock 
+AFTER UPDATE ON commande_produit
+   FOR EACH ROW
+   --Déclaration des variables
+DECLARE
+   qte_stock number(10);
+   E_STOCK_INSUFFISANT EXCEPTION;
+BEGIN
+    --Permet la sélection pour la vérification du stock
+   SELECT produit.quantite_stock
+     INTO qte_stock
+     FROM commande_produit
+     JOIN produit ON produit.ref_produit = no_produit
+     WHERE ref_produit = :NEW.no_produit;
+    --Si la quantité en stock est inférieur à zéro, on lève l'exception E_STOCK_INSUFISANT, sinon on fait rien.
+   IF qte_stock < 0 THEN
+      RAISE E_STOCK_INSUFFISANT;
+      ROLLBACK;
+   ELSE
+    --Permet la sélection de la quantité de stock qui va être livré
+      SELECT produit.quantite_stock
+        INTO qte_stock
+        FROM commande_produit
+        JOIN produit ON produit.ref_produit = no_produit
+        WHERE ref_produit = :OLD.no_produit;
 
+             --On insère dans Livraison_Commande_Produit la quantite qui va être livrée.
+      INSERT INTO livraison_commande_produit ( quantite_livree ) 
+      VALUES ( qte_stock );
+   END IF;
+
+EXCEPTION
+    --Si l'exception est lancé, elle va afficher le code d'erreur personnalisé avec ça description.
+   WHEN E_STOCK_INSUFFISANT THEN
+      RAISE_APPLICATION_ERROR( -2001,'Stock insuffisant pour ce produit.');
+END;
+/
 
 -- -----------------------------------------------------------------------------
 -- Question 2
