@@ -26,7 +26,7 @@
 --
 --
 --------------------------------------------------------------------------------------
-CREATE OR REPLACE TRIGGER TRG_qte_stock 
+CREATE OR REPLACE TRIGGER trg_qte_stock 
 AFTER UPDATE ON commande_produit
    FOR EACH ROW
    --Déclaration des variables
@@ -99,7 +99,7 @@ END;
 -- -----------------------------------------------------------------------------
 -- Question 3-A
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE TRIGGER TRG_stat_vente
+CREATE OR REPLACE TRIGGER trg_stat_vente
 AFTER INSERT
 ON Livraison_Commande_Produit
 
@@ -129,7 +129,41 @@ END;
 -- -----------------------------------------------------------------------------
 -- Question 3-B
 -- -----------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE p_test_creation_livraison IS
+    commande_produits Commande%ROWTYPE;
+BEGIN
+    -- Récupérer la commande no 37
+    SELECT *
+    INTO commande_produits
+    FROM Commande
+    WHERE no_commande = 37;
 
+    -- Créer la livraison
+    INSERT INTO Livraison(no_livraison, date_livraison)
+    VALUES (50037, commande_produits.date_commande);
+
+    -- Création des livraison de produit individuelles
+    INSERT INTO Livraison_Commande_Produit(no_livraison, no_commande, no_produit, quantite_livree)
+    VALUES (50037, commande_produits.no_commande, 'DD2001', 2);
+    
+    INSERT INTO Livraison_Commande_Produit(no_livraison, no_commande, no_produit, quantite_livree)
+    VALUES (50037, commande_produits.no_commande, 'LT2011', 1);
+    
+    INSERT INTO Livraison_Commande_Produit(no_livraison, no_commande, no_produit, quantite_livree)
+    VALUES (50037, commande_produits.no_commande, 'PC2000', 4);
+    
+    INSERT INTO Livraison_Commande_Produit(no_livraison, no_commande, no_produit, quantite_livree)
+    VALUES (50037, commande_produits.no_commande, 'DD2002', 2);
+    
+    INSERT INTO Livraison_Commande_Produit(no_livraison, no_commande, no_produit, quantite_livree)
+    VALUES (50037, commande_produits.no_commande, 'SC2001', 3);
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            ROLLBACK;
+            DBMS_OUTPUT.PUT_LINE('Quantité insuffisante pour la livraison!');
+END;
+/
 
 -- -----------------------------------------------------------------------------
 -- Question 4
