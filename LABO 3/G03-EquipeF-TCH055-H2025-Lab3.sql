@@ -203,13 +203,13 @@ END;
 --Permet d'afficher le nom de chaque client ayant faite une commande, le numéro de commande des produits,
 --la référence des produits commandées, la quantité commande pour chaque produit de la commande, et la quantité
 --livrée.
---IN (<TYPE>): 
---OUT (<TYPE>): Paramètrede type OUT (décrire!)
+-- Affiche les informations demandés en utilisant un curseur.
 --===========================================
 SET SERVEROUTPUT ON;
 
-DECLARE 
-    CURSOR cur_qte_livre IS 
+CREATE OR REPLACE PROCEDURE p_afficher_client
+IS
+CURSOR cur_qte_livre IS 
         SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
         f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
         FROM Commande
@@ -218,32 +218,26 @@ DECLARE
         JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
         JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
         WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
-BEGIN 
+
+        nom_client       Client.nom%TYPE;
+        prenom_client    Client.prenom%TYPE;
+        no_commande      Commande.no_commande%TYPE;
+        ref_produit      Produit.ref_produit%TYPE;
+        qte_cmd          Commande_Produit.quantite_cmd%TYPE;
+        qte_livre        NUMBER;
+
+BEGIN
+   OPEN cur_qte_livre;
     LOOP 
-        OPEN cur_qte_livre;
-        DBMS_OUTPUT.PUT_LINE(FETCH (cur_qte_livre));
+        
+        FETCH cur_qte_livre INTO nom_client, prenom_client, no_commande, ref_produit, qte_cmd, qte_livre;
+        DBMS_OUTPUT.PUT_LINE('Nom :'||nom_client ||'Prénom :'||prenom_client ||'No Commande :'|| no_commande 
+        ||'Référence produit :  '|| ref_produit ||'Quantité commandé au totale : '|| qte_cmd ||'Quantité livrée : '|| qte_livre);
 
         EXIT WHEN cur_qte_livre%NOTFOUND;
     END LOOP;   
     CLOSE cur_qte_livre;
-END;
-/
-
-
-CREATE OR REPLACE PROCEDURE p_afficher_client
-    (qteLivre NUMBER)
-IS
-DECLARE curseur_qte_livre cur_qte_livre;
-
-BEGIN
-    LOOP 
-        OPEN curseur_qte_livre;
-        DBMS_OUTPUT.PUT_LINE(curseur_qte_livre);
-
-        EXIT WHEN curseur_qte_livre%NOTFOUND;
-    END LOOP;   
-    CLOSE curseur_qte_livre;
-END p_afficher_client;
+END P_AFFICHER_CLIENT;
 /
 
 SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
@@ -268,37 +262,4 @@ WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 -- -----------------------------------------------------------------------------
 -- Question 8
 -- -----------------------------------------------------------------------------
-SET SERVEROUTPUT ON;
-CREATE OR REPLACE PROCEDURE p_affiche_facture
-    (id     IN     NUMBER) 
-IS
-    mt_total Facture.montant%type;
-    mt_paiements Paiement.montant%type;
-    mt_restant Paiement.montant%type;
-    date_limite Facture.date_facture%type;
-BEGIN
-    DBMS_OUTPUT.PUT_LINE('Pour la facture ' || TO_CHAR(id) || ' :');
-    SELECT montant, date_facture 
-    INTO mt_total, date_limite 
-    FROM Facture
-    WHERE id_facture = id;
-    DBMS_OUTPUT.PUT_LINE(' -Montant à payer   :' || TO_CHAR(mt_total) || ' $');
-    SELECT SUM(montant)
-    INTO mt_paiements
-    FROM Paiement
-    WHERE id_facture=id;
-    DBMS_OUTPUT.PUT_LINE(' -Montant déjà payé :' || TO_CHAR(mt_paiements) || ' $');
-    mt_restant := mt_total-mt_paiements;
-    DBMS_OUTPUT.PUT_LINE(' -Montant restant à payer  :' || TO_CHAR(mt_restant) || ' $');
-    
-    IF mt_restant <= 0 THEN
-        DBMS_OUTPUT.PUT_LINE('Paiement est complété');
-    ELSIF date_limite > SYSDATE THEN
-        DBMS_OUTPUT.PUT_LINE('Paiement non complété : Date limite de paiement: ' || TO_CHAR(date_limite, 'DD-MON-YYYY'));
-    ELSE
-        DBMS_OUTPUT.PUT_LINE('Paiement non complété - Solde en souffrance : Date limite de paiement: ' || TO_CHAR(date_limite, 'DD-MON-YYYY'));
-    END IF;
-END;
-/
 
-EXECUTE p_affiche_facture(60023);
