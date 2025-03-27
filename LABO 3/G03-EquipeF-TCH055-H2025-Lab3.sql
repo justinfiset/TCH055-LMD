@@ -192,9 +192,53 @@ END;
 / 
 
 -- -----------------------------------------------------------------------------
--- Question 5
+-- Question 5   
+--Implémenter une procédure qui va afficher, le nom de chaque client ayant faite une commande, le 
+--numéro de commande des produits, la référence des produits commandées, la quantité commandée 
+--pour chaque produit de la commande, et la quantité livrée. Utiliser la fonction faite à la question 4. 
 -- -----------------------------------------------------------------------------
+--===========================================
+--Procédure:  p_afficher_client
+--Description: 
+--Permet d'afficher le nom de chaque client ayant faite une commande, le numéro de commande des produits,
+--la référence des produits commandées, la quantité commande pour chaque produit de la commande, et la quantité
+--livrée.
+--IN (<TYPE>): 
+--OUT (<TYPE>): Paramètrede type OUT (décrire!)
+--===========================================
+SET SERVEROUTPUT ON;
 
+CREATE OR REPLACE PROCEDURE p_afficher_client
+    (qteLivre NUMBER)
+IS
+DECLARE 
+    CURSOR cur_qte_livre(qte_livraison NUMBER) IS 
+        SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
+        f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
+        FROM Commande
+        JOIN Client ON Commande.no_client = Client.no_client
+        JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
+        JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
+        JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
+        WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
+BEGIN
+    LOOP 
+        DBMS_OUTPUT.PUT_LINE()
+
+        EXIT WHEN cur_qte_livre%NOTFOUND;
+    END LOOP;    
+
+END;
+/
+
+SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
+f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
+FROM Commande
+JOIN Client ON Commande.no_client = Client.no_client
+JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
+JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
+JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
+WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 
 -- -----------------------------------------------------------------------------
 -- Question 6
