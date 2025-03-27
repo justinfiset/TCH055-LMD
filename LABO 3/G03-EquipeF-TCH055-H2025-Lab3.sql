@@ -208,11 +208,8 @@ END;
 --===========================================
 SET SERVEROUTPUT ON;
 
-CREATE OR REPLACE PROCEDURE p_afficher_client
-    (qteLivre NUMBER)
-IS
 DECLARE 
-    CURSOR cur_qte_livre(qte_livraison NUMBER) IS 
+    CURSOR cur_qte_livre IS 
         SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
         f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
         FROM Commande
@@ -221,14 +218,32 @@ DECLARE
         JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
         JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
         WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
-BEGIN
+BEGIN 
     LOOP 
-        DBMS_OUTPUT.PUT_LINE()
+        OPEN cur_qte_livre;
+        DBMS_OUTPUT.PUT_LINE(FETCH (cur_qte_livre));
 
         EXIT WHEN cur_qte_livre%NOTFOUND;
-    END LOOP;    
-
+    END LOOP;   
+    CLOSE cur_qte_livre;
 END;
+/
+
+
+CREATE OR REPLACE PROCEDURE p_afficher_client
+    (qteLivre NUMBER)
+IS
+DECLARE curseur_qte_livre cur_qte_livre;
+
+BEGIN
+    LOOP 
+        OPEN curseur_qte_livre;
+        DBMS_OUTPUT.PUT_LINE(curseur_qte_livre);
+
+        EXIT WHEN curseur_qte_livre%NOTFOUND;
+    END LOOP;   
+    CLOSE curseur_qte_livre;
+END p_afficher_client;
 /
 
 SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
