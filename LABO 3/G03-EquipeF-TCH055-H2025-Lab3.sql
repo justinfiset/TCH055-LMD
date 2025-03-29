@@ -192,9 +192,62 @@ END;
 / 
 
 -- -----------------------------------------------------------------------------
--- Question 5
+-- Question 5   
+--Implémenter une procédure qui va afficher, le nom de chaque client ayant faite une commande, le 
+--numéro de commande des produits, la référence des produits commandées, la quantité commandée 
+--pour chaque produit de la commande, et la quantité livrée. Utiliser la fonction faite à la question 4. 
 -- -----------------------------------------------------------------------------
+--===========================================
+--Procédure:  p_afficher_client
+--Description: 
+--Permet d'afficher le nom de chaque client ayant faite une commande, le numéro de commande des produits,
+--la référence des produits commandées, la quantité commande pour chaque produit de la commande, et la quantité
+--livrée.
+-- Affiche les informations demandés en utilisant un curseur.
+--===========================================
+SET SERVEROUTPUT ON;
 
+CREATE OR REPLACE PROCEDURE p_afficher_client
+IS
+CURSOR cur_qte_livre IS 
+        SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
+        f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
+        FROM Commande
+        JOIN Client ON Commande.no_client = Client.no_client
+        JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
+        JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
+        JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
+        WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
+
+        nom_client       Client.nom%TYPE;
+        prenom_client    Client.prenom%TYPE;
+        no_commande      Commande.no_commande%TYPE;
+        ref_produit      Produit.ref_produit%TYPE;
+        qte_cmd          Commande_Produit.quantite_cmd%TYPE;
+        qte_livre        NUMBER;
+
+BEGIN
+   OPEN cur_qte_livre;
+    LOOP 
+        
+        FETCH cur_qte_livre INTO nom_client, prenom_client, no_commande, ref_produit, qte_cmd, qte_livre;
+        DBMS_OUTPUT.PUT_LINE('Nom :'||nom_client ||'Prénom :'||prenom_client ||'No Commande :'|| no_commande 
+        ||'Référence produit :  '|| ref_produit ||'Quantité commandé au totale : '|| qte_cmd ||'Quantité livrée : '|| qte_livre);
+
+        EXIT WHEN cur_qte_livre%NOTFOUND;
+    END LOOP;   
+    CLOSE cur_qte_livre;
+END P_AFFICHER_CLIENT;
+/
+
+SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
+f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
+FROM Commande
+JOIN Client ON Commande.no_client = Client.no_client
+JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
+JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
+JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
+WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 
 -- -----------------------------------------------------------------------------
 -- Question 6
