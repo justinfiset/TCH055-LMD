@@ -204,6 +204,89 @@ END;
 -- -----------------------------------------------------------------------------
 -- Question 7
 -- -----------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE P_produire_facture(
+    p_id_livraison IN NUMBER,
+    p_remise IN NUMBER DEFAULT 0
+) IS
+    v_id_facture NUMBER;
+    v_id_client NUMBER;
+    v_nom_client VARCHAR2(100);
+    v_prenom_client VARCHAR2(100);
+    v_telephone VARCHAR2(20);
+    v_adresse VARCHAR2(255);
+    v_date_livraison DATE;
+    v_date_limite DATE;
+    v_total NUMBER := 0;
+    v_total_apres_remise NUMBER;
+    v_total_taxes NUMBER;
+    v_montant_total NUMBER;
+    
+    -- Curseur pour récupérer les produits livrés
+    CURSOR cur_produits IS
+        SELECT p.id_produit, p.nom, p.marque, p.prix_unitaire, lc.quantite
+        FROM Livraison_Commande_Produit lc
+        JOIN Produit p ON lc.id_produit = p.id_produit
+        WHERE lc.id_livraison = p_id_livraison;
+    
+BEGIN
+    -- Vérifier si la livraison existe
+    SELECT c.id_client, c.nom, c.prenom, c.telephone, c.adresse, l.date_livraison
+    INTO v_id_client, v_nom_client, v_prenom_client, v_telephone, v_adresse, v_date_livraison
+    FROM Livraison l
+    JOIN Commande co ON l.id_commande = co.id_commande
+    JOIN Client c ON co.id_client = c.id_client
+    WHERE l.id_livraison = p_id_livraison;
+
+    -- Calcul de la date limite de paiement (30 jours après livraison)
+    v_date_limite := v_date_livraison + 30;
+
+    -- Calculer le total avant remise
+    FOR r IN cur_produits LOOP
+        v_total := v_total + (r.prix_unitaire * r.quantite);
+    END LOOP;
+
+    -- Appliquer la remise
+    v_total_apres_remise := v_total * (1 - p_remise / 100);
+
+    -- Calculer les taxes et le montant total
+    v_total_taxes := v_total_apres_remise * 0.15;
+    v_montant_total := v_total_apres_remise + v_total_taxes;
+
+    -- Générer l'identifiant de la facture via une séquence
+    SELECT SEQ_FACTURE.NEXTVAL INTO v_id_facture FROM DUAL;
+
+    -- Insérer la facture dans la base de données
+    INSERT INTO Facture (id_facture, id_livraison, date_facturation, date_limite, montant_total, montant_remise, montant_taxes)
+    VALUES (v_id_facture, p_id_livraison, SYSDATE, v_date_limite, v_total, v_total_apres_remise, v_total_taxes);
+
+    -- Affichage de la facture
+    DBMS_OUTPUT.PUT_LINE('--- FACTURE ---');
+    DBMS_OUTPUT.PUT_LINE('Client : ' || v_nom_client || ' ' || v_prenom_client);
+    DBMS_OUTPUT.PUT_LINE('Téléphone : ' || v_telephone);
+    DBMS_OUTPUT.PUT_LINE('Adresse : ' || v_adresse);
+    DBMS_OUTPUT.PUT_LINE('Livraison # ' || p_id_livraison || ' - Date : ' || v_date_livraison);
+    DBMS_OUTPUT.PUT_LINE('Date limite de paiement : ' || v_date_limite);
+    DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+
+    FOR r IN cur_produits LOOP
+        DBMS_OUTPUT.PUT_LINE(r.nom || ' | ' || r.marque || ' | ' || r.prix_unitaire || ' | ' || r.quantite || ' | ' || (r.prix_unitaire * r.quantite));
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+    DBMS_OUTPUT.PUT_LINE('Total avant taxes : ' || v_total);
+    DBMS_OUTPUT.PUT_LINE('Remise : ' || p_remise || '%');
+    DBMS_OUTPUT.PUT_LINE('Total après remise : ' || v_total_apres_remise);
+    DBMS_OUTPUT.PUT_LINE('Taxes (15%) : ' || v_total_taxes);
+    DBMS_OUTPUT.PUT_LINE('Montant total à payer : ' || v_montant_total);
+    DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur : Livraison introuvable.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur : ' || SQLERRM);
+END P_produire_facture;
+/
 
 
 -- -----------------------------------------------------------------------------
