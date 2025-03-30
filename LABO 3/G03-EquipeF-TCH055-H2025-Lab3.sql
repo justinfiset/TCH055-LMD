@@ -161,9 +161,11 @@ BEGIN
     EXCEPTION
         WHEN OTHERS THEN
             ROLLBACK;
-            DBMS_OUTPUT.PUT_LINE('Quantité insuffisante pour la livraison!');
+            dbms_output.put_line('Quantité insuffisante pour la livraison!');
 END;
 /
+
+EXECUTE p_test_creation_livraison;
 
 -- -----------------------------------------------------------------------------
 -- Question 4
@@ -252,7 +254,52 @@ WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 -- -----------------------------------------------------------------------------
 -- Question 6
 -- -----------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE p_preparer_livraison (
+    num_livraison NUMBER) IS 
+    livraison_client Livraison%ROWTYPE;
+    client_livraison Client%ROWTYPE;
+    commande_client Commande%ROWTYPE;
+    adresse_client Adresse%ROWTYPE;
+    num_client NUMBER;
+BEGIN
+    SELECT *
+    INTO livraison_client
+    FROM Livraison
+    WHERE Livraison.no_livraison = num_livraison;
 
+    IF livraison_client IS NOT NULL THEN 
+        SELECT Commande.no_client
+        INTO num_client
+        FROM Commande
+        INNER JOIN Livraison_Commande_Produit ON Livraison_Commande_Produit.no_commande = Commande.no_commande
+        WHERE livraison_commande_produit.no_livraison = num_livraison
+        GROUP BY Livraison_Commande_Produit.no_commande;
+
+        SELECT *
+        INTO client_livraison
+        FROM Client
+        WHERE Client.no_client = num_client;
+
+        SELECT *
+        INTO adresse_client
+        FROM Adresse
+        WHERE id_adresse = client_livraison.id_adresse;
+
+        dbms_output.put_line(RPAD("No Client", 10) || ": " || client_livraison.no_client);
+        dbms_output.put_line(RPAD("Nom", 10) || ": " || client_livraison.nom);
+        dbms_output.put_line(RPAD("Prénom", 10) || ": " || client_livraison.prenoom);
+        dbms_output.put_line(RPAD("Téléphone", 10) || ": " || client_livraison.telephone);
+        dbms_output.put_line(RPAD("Adresse", 10) || ": " || adresse_client.no_cicique || ", " 
+            || adresse_client.nom_rue || ", " || adresse_client.ville || ", " 
+            || adresse_client.code_postal || ". " || adresse_client.pays);
+    ELSE
+        dbms_output.put_line("Erreur: la livraison " || num_livraison || " n'existe pas.");
+    END IF;
+END;
+/
+
+EXECUTE p_preparer_livraison(50037);
+EXECUTE p_preparer_livraison(99999);
 
 -- -----------------------------------------------------------------------------
 -- Question 7
