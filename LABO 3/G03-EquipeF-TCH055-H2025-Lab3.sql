@@ -211,7 +211,7 @@ SET SERVEROUTPUT ON;
 
 CREATE OR REPLACE PROCEDURE p_afficher_client
 IS
-CURSOR cur_qte_livre IS 
+CURSOR cur_qte_livre IS     
         SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
         f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
         FROM Commande
@@ -256,44 +256,105 @@ WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 -- -----------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE p_preparer_livraison (
     num_livraison NUMBER) IS 
+    livraison_count NUMBER;
     livraison_client Livraison%ROWTYPE;
     client_livraison Client%ROWTYPE;
     commande_client Commande%ROWTYPE;
     adresse_client Adresse%ROWTYPE;
     num_client NUMBER;
+
+    -- Curseur pour récupérer les produits de la livraison
+    CURSOR cur_produits_livraison IS
+        SELECT *
+        FROM Livraison_Commande_Produit
+        WHERE no_livraison = num_livraison;
+    liv_com_produit Livraison_Commande_Produit%ROWTYPE;
+    produits_livraison Produit%ROWTYPE;
+    date_commande_liv DATE;
 BEGIN
-    SELECT *
-    INTO livraison_client
+    DBMS_OUTPUT.ENABLE;
+    
+    -- Récupération du nombre de livraison avec ce numéro de livraison (0 ou 1)
+    SELECT COUNT(*) 
+    INTO livraison_count
     FROM Livraison
     WHERE Livraison.no_livraison = num_livraison;
 
-    IF livraison_client IS NOT NULL THEN 
+    IF livraison_count > 0 THEN -- Si la livraison existe bien (donc que le compte n'est pas 0)
+        -- On récupère la livraison avec ce numéro
+        SELECT *
+        INTO livraison_client
+        FROM Livraison
+        WHERE Livraison.no_livraison = num_livraison;
+
+        -- On récupère le no du client associé à la livraison
         SELECT Commande.no_client
         INTO num_client
         FROM Commande
         INNER JOIN Livraison_Commande_Produit ON Livraison_Commande_Produit.no_commande = Commande.no_commande
         WHERE livraison_commande_produit.no_livraison = num_livraison
-        GROUP BY Livraison_Commande_Produit.no_commande;
+        AND ROWNUM = 1;
 
+        -- Récuperation du client à l'aide du no de client récupéré plus haut
         SELECT *
         INTO client_livraison
         FROM Client
         WHERE Client.no_client = num_client;
 
+        -- Récupération de l'adresse associé au client de la livraison
         SELECT *
         INTO adresse_client
         FROM Adresse
         WHERE id_adresse = client_livraison.id_adresse;
 
-        dbms_output.put_line(RPAD("No Client", 10) || ": " || client_livraison.no_client);
-        dbms_output.put_line(RPAD("Nom", 10) || ": " || client_livraison.nom);
-        dbms_output.put_line(RPAD("Prénom", 10) || ": " || client_livraison.prenoom);
-        dbms_output.put_line(RPAD("Téléphone", 10) || ": " || client_livraison.telephone);
-        dbms_output.put_line(RPAD("Adresse", 10) || ": " || adresse_client.no_cicique || ", " 
-            || adresse_client.nom_rue || ", " || adresse_client.ville || ", " 
-            || adresse_client.code_postal || ". " || adresse_client.pays);
-    ELSE
-        dbms_output.put_line("Erreur: la livraison " || num_livraison || " n'existe pas.");
+        -- Affichage de l'entête du bordereau de livraison
+        dbms_output.put_line(RPAD('No Client', 10) || ': ' || client_livraison.no_client);
+        dbms_output.put_line(RPAD('Nom', 10) || ': ' || client_livraison.nom);
+        dbms_output.put_line(RPAD('Prénom', 10) || ': ' || client_livraison.prenom);
+        dbms_output.put_line(RPAD('Téléphone', 10) || ': ' || client_livraison.telephone);
+        dbms_output.put_line(RPAD('Adresse', 10) || ': ' || adresse_client.no_civique || ', ' 
+            || adresse_client.nom_rue || ', ' || adresse_client.ville || ', ' 
+            || adresse_client.code_postal || '. ' || adresse_client.pays);
+        dbms_output.put_line(RPAD('No Livraison', 15) || ': ' || num_livraison);
+        dbms_output.put_line(RPAD('Date Livraison', 15) || ': ' || TO_CHAR(livraison_client.date_livraison));
+        
+        -- Affichage du contenue de la livraion
+        dbms_output.put_line(RPAD('-', 87, '-'));
+        dbms_output.put_line(RPAD('No Produit', 12) || RPAD('Nom Produit', 22) ||
+                             RPAD('Marque', 22) || RPAD('Q. Livrée', 12) || 
+                             RPAD('No CMD.', 9) || RPAD('Date CMD.', 12));
+        dbms_output.put_line(RPAD('-', 87, '-'));
+        
+        -- On affiche les produits de la livraison
+        OPEN cur_produits_livraison; -- Ouverture de pointeur
+
+        LOOP
+            FETCH cur_produits_livraison INTO liv_com_produit; -- On récupère un produit de la livraison
+            EXIT WHEN cur_produits_livraison%NOTFOUND; -- On sort de la boucle si on a tout lu les produits dans la livraison
+
+            -- On récupère le produuit qui correspond au curseur en cours
+            SELECT *
+            INTO produits_livraison
+            FROM Produit
+            WHERE Produit.ref_produit = liv_com_produit.no_produit;
+            
+            -- On récupère la date de la commande associée à la livraison
+            SELECT Commande.date_commande
+            INTO date_commande_liv
+            FROM Commande
+            WHERE Commande.no_commande = liv_com_produit.no_commande; 
+
+            -- Affichage des détails du produit
+            dbms_output.put_line(RPAD(liv_com_produit.no_produit, 12) || RPAD(produits_livraison.nom_produit, 22) ||
+                                 RPAD(produits_livraison.marque, 22) || RPAD(liv_com_produit.quantite_livree, 12) ||
+                                 RPAD(liv_com_produit.no_commande, 9) || RPAD(TO_CHAR(date_commande_liv), 12));
+        END LOOP;
+        CLOSE cur_produits_livraison; -- Fermeture du pointeur
+        
+        dbms_output.put_line(RPAD('-', 87, '-'));
+        dbms_output.put_line(RPAD('-', 87, '-'));
+    ELSE -- Gestion du cas où la livraison n'existe pas, on affiche une erreur
+        dbms_output.put_line('Erreur: la livraison ' || num_livraison || ' n''existe pas.');
     END IF;
 END;
 /
