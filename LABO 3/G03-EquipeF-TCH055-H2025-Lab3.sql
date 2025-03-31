@@ -453,4 +453,37 @@ END P_produire_facture;
 -- -----------------------------------------------------------------------------
 -- Question 8
 -- -----------------------------------------------------------------------------
+SET SERVEROUTPUT ON;
+CREATE OR REPLACE PROCEDURE p_affiche_facture
+    (id     IN     NUMBER) 
+IS
+    mt_total Facture.montant%type;
+    mt_paiements Paiement.montant%type;
+    mt_restant Paiement.montant%type;
+    date_limite Facture.date_facture%type;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Pour la facture ' || TO_CHAR(id) || ' :');
+    SELECT montant, date_facture 
+    INTO mt_total, date_limite 
+    FROM Facture
+    WHERE id_facture = id;
+    DBMS_OUTPUT.PUT_LINE(' -Montant à payer   :' || TO_CHAR(mt_total) || ' $');
+    SELECT SUM(montant)
+    INTO mt_paiements
+    FROM Paiement
+    WHERE id_facture=id;
+    DBMS_OUTPUT.PUT_LINE(' -Montant déjà payé :' || TO_CHAR(mt_paiements) || ' $');
+    mt_restant := mt_total-mt_paiements;
+    DBMS_OUTPUT.PUT_LINE(' -Montant restant à payer  :' || TO_CHAR(mt_restant) || ' $');
+    
+    IF mt_restant <= 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Paiement est complété');
+    ELSIF date_limite > SYSDATE THEN
+        DBMS_OUTPUT.PUT_LINE('Paiement non complété : Date limite de paiement: ' || TO_CHAR(date_limite, 'DD-MON-YYYY'));
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Paiement non complété - Solde en souffrance : Date limite de paiement: ' || TO_CHAR(date_limite, 'DD-MON-YYYY'));
+    END IF;
+END;
+/
 
+EXECUTE p_affiche_facture(60023);
