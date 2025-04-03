@@ -301,6 +301,15 @@ WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 -- -----------------------------------------------------------------------------
 -- Question 6
 -- -----------------------------------------------------------------------------
+
+-- ===========================================
+-- Procédure: p_preparer_livraison
+-- Description:
+--     Procédure qui produit et affiche un bordereau qui contient les informations du client
+--     et de tous les produits pour une commande donées ainsi que les informations de la commande.
+-- IN (NUMBER): num_livraison : le nunméro de la livraison duquel il faut préparer le bordereau
+-- ===========================================
+
 CREATE OR REPLACE PROCEDURE p_preparer_livraison (
     num_livraison NUMBER) IS 
     livraison_count NUMBER;
@@ -406,7 +415,10 @@ BEGIN
 END;
 /
 
+-- Test d'execution pour la livraison fait en 3-B
 EXECUTE p_preparer_livraison(50037);
+
+-- Test qui devrait afficher le cas où la livraison n'existe pas
 EXECUTE p_preparer_livraison(99999);
 
 -- -----------------------------------------------------------------------------
