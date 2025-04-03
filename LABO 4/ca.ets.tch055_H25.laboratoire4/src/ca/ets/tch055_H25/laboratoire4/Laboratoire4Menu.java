@@ -1,4 +1,4 @@
-package ca.ets.tch055_H25.laboratoire4;
+package ca.ets.tch055_H25.laboratoire4.src.ca.ets.tch055_H25.laboratoire4;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
