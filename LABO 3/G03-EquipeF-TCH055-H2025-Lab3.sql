@@ -94,8 +94,10 @@ BEGIN
 END;
 /
 -- -----------------------------------------------------------------------------
--- Question 3-A
+-- Question 3-A Implémenter un déclencheur qui calcule les statistiques de vente. Ainsi, à 
+-- chaque livraison d’un article, le déclencheur met à jour la table Statistique_Vente avec un INSERT ou UPDATE. 
 -- -----------------------------------------------------------------------------
+
 -- ===========================================
 -- DECLENCHEUR: trg_stat_vente
 -- TABLE: Livraison_Commande_Produitt
@@ -106,6 +108,7 @@ END;
 --     Si aucune statistique pour ce produit n'existe pour le moment, on insère le nombre de produit livrée
 --     directement dans la table.
 -- ===========================================
+
 CREATE OR REPLACE TRIGGER trg_stat_vente
 AFTER INSERT
 ON Livraison_Commande_Produit
@@ -139,7 +142,18 @@ END;
 
 -- -----------------------------------------------------------------------------
 -- Question 3-B
+-- Implémenter une procédure qui permettra de tester les déclencheur des questions 1, 2 et 3-A. Cette
+-- procédure crée une nouvelle livraison pour la totalité de la commande #37. Donner la valeur 50037
+--comme identifiant de cette livraison (l’attribut id_livraison). 
 -- -----------------------------------------------------------------------------
+
+-- ===========================================
+-- Procédure: p_test_creation_livraison
+-- Description:
+--     Création d'une livraison pour la totalité de la commande #37
+--     avec le numéro de livraison étant 50037 (id_livraison).
+-- ===========================================
+
 CREATE OR REPLACE PROCEDURE p_test_creation_livraison IS
     commande_produits Commande%ROWTYPE;
 BEGIN
@@ -169,6 +183,9 @@ BEGIN
     INSERT INTO Livraison_Commande_Produit(no_livraison, no_commande, no_produit, quantite_livree)
     VALUES (50037, commande_produits.no_commande, 'SC2001', 3);
 
+    -- Si l'un des produits n'est pas en quantité suffisante, une exception sera lancé
+    -- on l'attrape et on annule tous les changements que l'on vient de faire et on indique
+    -- un message à l'utilisateur.
     EXCEPTION
         WHEN OTHERS THEN
             ROLLBACK;
@@ -176,6 +193,7 @@ BEGIN
 END;
 /
 
+-- Test d'execution de la question 3-B
 EXECUTE p_test_creation_livraison;
 
 -- -----------------------------------------------------------------------------
