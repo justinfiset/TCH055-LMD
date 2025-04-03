@@ -191,7 +191,7 @@ BEGIN
             ROLLBACK;
             dbms_output.put_line('Quantité insuffisante pour la livraison!');
 END;
-/
+/   
 
 -- Test d'execution de la question 3-B
 EXECUTE p_test_creation_livraison;
@@ -207,7 +207,8 @@ EXECUTE p_test_creation_livraison;
 -- ============================================
 -- Fonction:  f_quantite_deja_livree
 -- Description:
--- Permet d'avoir la quantité de stock déjà livrée.
+--     Fonction qiu permet d'avoir la quantité de stock déjà livrée pour un produit et
+--     une commande donnée.
 -- IN (<TYPE>): Le numéro des produits (ref_produit)
 -- IN (<TYPE>): Le numéro des commandes (ref_commande)
 -- RETOUR (<TYPE>): 
@@ -222,6 +223,7 @@ RETURN Livraison_Commande_Produit.quantite_livree%TYPE
 IS
     quant_liv Livraison_Commande_Produit.quantite_livree%TYPE;
 BEGIN
+    -- Récupératin du nombre de produit livrée pour la commande donnée.
     SELECT l.quantite_livree
     INTO quant_liv
     FROM Livraison_Commande_Produit l
@@ -230,6 +232,8 @@ BEGIN
     
     RETURN quant_liv;
         
+-- Gestion du cas où le produit n'existe pas pour cette commande.
+-- Dans ce cas, on retourne -1.
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
         quant_liv := -1;
@@ -302,6 +306,15 @@ END P_AFFICHER_CLIENT;
 -- -----------------------------------------------------------------------------
 -- Question 6
 -- -----------------------------------------------------------------------------
+
+-- ===========================================
+-- Procédure: p_preparer_livraison
+-- Description:
+--     Procédure qui produit et affiche un bordereau qui contient les informations du client
+--     et de tous les produits pour une commande donées ainsi que les informations de la commande.
+-- IN (NUMBER): num_livraison : le nunméro de la livraison duquel il faut préparer le bordereau
+-- ===========================================
+
 CREATE OR REPLACE PROCEDURE p_preparer_livraison (
     num_livraison NUMBER) IS 
     livraison_count NUMBER;
@@ -407,7 +420,10 @@ BEGIN
 END;
 /
 
+-- Test d'execution pour la livraison fait en 3-B
 EXECUTE p_preparer_livraison(50037);
+
+-- Test qui devrait afficher le cas où la livraison n'existe pas
 EXECUTE p_preparer_livraison(99999);
 
 -- -----------------------------------------------------------------------------
