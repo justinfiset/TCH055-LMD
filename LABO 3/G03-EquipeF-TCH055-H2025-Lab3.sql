@@ -169,7 +169,23 @@ EXECUTE p_test_creation_livraison;
 
 -- -----------------------------------------------------------------------------
 -- Question 4
+--Implémenter une fonction PL/SQL, nommée f_quantite_deja_livree, qui prend en entrée un numéro 
+--de référence d’un produit ainsi qu’un numéro de commande et retourne la quantité déjà livrée (de 
+--ce produit).  
+--La fonction doit traiter le cas où le produit n’existe pas pour cette commande. Dans ce cas, elle 
+--retourne -1.  
 -- -----------------------------------------------------------------------------
+-- ============================================
+-- Fonction:  f_quantite_deja_livree
+-- Description:
+-- Permet d'avoir la quantité de stock déjà livrée.
+-- IN (<TYPE>): Le numéro des produits (ref_produit)
+-- IN (<TYPE>): Le numéro des commandes (ref_commande)
+-- RETOUR (<TYPE>): 
+--  Retourne le nombre de stock déjà livré de chaque produit
+--  ou sinon si c'est du stock non livré c'est -1.
+-- ===========================================
+
 CREATE OR REPLACE FUNCTION f_quantite_deja_livree
 (ref_produit Livraison_Commande_Produit.no_produit%TYPE,
  ref_commande Livraison_Commande_Produit.no_commande%TYPE)
