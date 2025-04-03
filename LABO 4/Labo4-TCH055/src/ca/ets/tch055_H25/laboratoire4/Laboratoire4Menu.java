@@ -53,13 +53,8 @@ public class Laboratoire4Menu {
 	 * @throws SQLException 
 	 */
     public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
-    	
-    	Connection une_connexion = null ;
-    	
-    	// Ligne suivante à supprimer après implémentation 
-    	System.out.println("connexionBDD() n'est pas implémentée");  
-    	
-    	
+	    Class.forName("oracle.jdbc.driver.OracleDriver");
+    	Connection une_connexion = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "tp4", "tp4");
     	return une_connexion  ; 
     }
     
@@ -144,9 +139,14 @@ public class Laboratoire4Menu {
      */
     public static boolean fermetureConnexion() {
     	boolean resultat = false ;
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 0 : fermetureConnexion() n'est pas implémentée");
-    	
+
+		try {
+			connexion.close();
+			resultat = true;
+		} catch (SQLException e) {
+			System.out.println("Erreur lors de la fermeture de connexion : " + e.getMessage());
+		}
+
     	return resultat ; 
     }
 
@@ -265,8 +265,7 @@ public class Laboratoire4Menu {
             // FIn de la boucle While - Fermeture de la connexion 
             if(fermetureConnexion()){
                 System.out.println("Deconnection reussie...");
-                
-            }else{
+            } else {
                 System.out.println("Échec ou Erreur lors de le déconnexion...");
             }
             
