@@ -1,30 +1,27 @@
 -- ===================================================================
 -- Auteurs : Justin Fiset, Aimé Melançon, Nikola Sunjka, Justin Lavoie-Ladouceur
 
--- Description : 
---
+-- Description : Laboratoire 3 du cours TCH055 : Les données de l’entreprise de ventre de produits
+-- informatiques, écriture des triggers, fonctions et procédures PL/SQL
 -- ====================================================================
 
 -- -----------------------------------------------------------------------------
 -- Question 1  :
---Implémenter un déclencheur qui met à jour la quantité en stock d’un produit qui sera livré. Il faut que 
---votre déclencheur vérifie en premier, si la quantité en stock est suffisante. Si ce n’est pas le cas, le 
---déclencheur lève une exception nommée E_STOCK_INSUFFISANT. 
---Indication : lorsqu’un un produit est destiné à être livré, il y aura une insertion d’un tuple dans la table 
---Livraison_Commande_Produit.  
---Note : Pour simplification, on ne traite pas les modifications dans la quantité à livrer, car dans ce cas, 
---la mise à jour de la quantité en stock est différente.
+-- Implémenter un déclencheur qui met à jour la quantité en stock d’un produit qui sera livré. Il faut que 
+-- votre déclencheur vérifie en premier, si la quantité en stock est suffisante. Si ce n’est pas le cas, le 
+--  déclencheur lève une exception nommée E_STOCK_INSUFFISANT. 
+-- Indication : lorsqu’un un produit est destiné à être livré, il y aura une insertion d’un tuple dans la table 
+-- Livraison_Commande_Produit.  
+-- Note : Pour simplification, on ne traite pas les modifications dans la quantité à livrer, car dans ce cas, 
+-- la mise à jour de la quantité en stock est différente.
 -------------------------------------------------------------------------------------
---
---DECLENCHEUR: TRG_qte_stock
---TABLE: Commande_Produit
---TYPE: En même temps qu'une mise à jours
---DESCRIPTION:
--- Vérifie si le stock du produit n'est pas inférieur à zéro. Si la quantité du stock n'est pas 
---suffisante le déclencheur lève une exception nommée E_STOCK_INSUFFISANT. Si la quantité du stock 
---est suffisante il va avoir une insertion d'un tuple dans la table Livraison_Commande_Produit.
---
---
+-- DECLENCHEUR: TRG_qte_stock
+-- TABLE: Commande_Produit
+-- TYPE: En même temps qu'une mise à jours
+-- DESCRIPTION:
+--     Vérifie si le stock du produit n'est pas inférieur à zéro. Si la quantité du stock n'est pas 
+--     suffisante le déclencheur lève une exception nommée E_STOCK_INSUFFISANT. Si la quantité du stock 
+--     est suffisante il va avoir une insertion d'un tuple dans la table Livraison_Commande_Produit.
 --------------------------------------------------------------------------------------
 CREATE OR REPLACE TRIGGER trg_qte_stock 
 AFTER UPDATE ON commande_produit
@@ -97,8 +94,21 @@ BEGIN
 END;
 /
 -- -----------------------------------------------------------------------------
--- Question 3-A
+-- Question 3-A Implémenter un déclencheur qui calcule les statistiques de vente. Ainsi, à 
+-- chaque livraison d’un article, le déclencheur met à jour la table Statistique_Vente avec un INSERT ou UPDATE. 
 -- -----------------------------------------------------------------------------
+
+-- ===========================================
+-- DECLENCHEUR: trg_stat_vente
+-- TABLE: Livraison_Commande_Produitt
+-- TYPE: Après une insertion
+-- DESCRIPTION:
+--     Met à jours la table Statistique_Vente après chaque livraison d'un article.
+--     On ajoute le nombre de produits livrées aux statistiques d'un produit pour le mois courant.
+--     Si aucune statistique pour ce produit n'existe pour le moment, on insère le nombre de produit livrée
+--     directement dans la table.
+-- ===========================================
+
 CREATE OR REPLACE TRIGGER trg_stat_vente
 AFTER INSERT
 ON Livraison_Commande_Produit
@@ -106,7 +116,8 @@ ON Livraison_Commande_Produit
 FOR EACH ROW
 DECLARE
     nb_stat NUMBER(10);
-    date_livraison DATE := SYSDATE;
+    -- Récupéraiton de la date courante
+    date_livraison DATE := SYSDATE; 
 BEGIN
     -- Vérification si la statistique existe
     SELECT COUNT(*)
@@ -115,10 +126,13 @@ BEGIN
     WHERE ref_produit = :NEW.no_produit;
     
 IF nb_stat > 0 THEN
+    -- Si la statistique existe déjà, on ajoute le nombre de produit livrée au total de vendue.
     UPDATE Statistique_Vente
     SET quantite_vendue = quantite_vendue + :NEW.quantite_livree
     WHERE Statistique_Vente.ref_produit = :NEW.no_produit;
 ELSE
+    -- Si le produit n'existe pas, on met directement le nombre de produit livrée dans
+    -- une nouvelle ligne.
     INSERT INTO Statistique_Vente(ref_produit, code_mois, quantite_vendue)
     VALUES (:NEW.no_produit, extract(month FROM date_livraison), :NEW.quantite_livree);
 END IF;
@@ -128,7 +142,18 @@ END;
 
 -- -----------------------------------------------------------------------------
 -- Question 3-B
+-- Implémenter une procédure qui permettra de tester les déclencheur des questions 1, 2 et 3-A. Cette
+-- procédure crée une nouvelle livraison pour la totalité de la commande #37. Donner la valeur 50037
+--comme identifiant de cette livraison (l’attribut id_livraison). 
 -- -----------------------------------------------------------------------------
+
+-- ===========================================
+-- Procédure: p_test_creation_livraison
+-- Description:
+--     Création d'une livraison pour la totalité de la commande #37
+--     avec le numéro de livraison étant 50037 (id_livraison).
+-- ===========================================
+
 CREATE OR REPLACE PROCEDURE p_test_creation_livraison IS
     commande_produits Commande%ROWTYPE;
 BEGIN
@@ -158,18 +183,39 @@ BEGIN
     INSERT INTO Livraison_Commande_Produit(no_livraison, no_commande, no_produit, quantite_livree)
     VALUES (50037, commande_produits.no_commande, 'SC2001', 3);
 
+    -- Si l'un des produits n'est pas en quantité suffisante, une exception sera lancé
+    -- on l'attrape et on annule tous les changements que l'on vient de faire et on indique
+    -- un message à l'utilisateur.
     EXCEPTION
         WHEN OTHERS THEN
             ROLLBACK;
             dbms_output.put_line('Quantité insuffisante pour la livraison!');
 END;
-/
+/   
 
+-- Test d'execution de la question 3-B
 EXECUTE p_test_creation_livraison;
 
 -- -----------------------------------------------------------------------------
 -- Question 4
+--Implémenter une fonction PL/SQL, nommée f_quantite_deja_livree, qui prend en entrée un numéro 
+--de référence d’un produit ainsi qu’un numéro de commande et retourne la quantité déjà livrée (de 
+--ce produit).  
+--La fonction doit traiter le cas où le produit n’existe pas pour cette commande. Dans ce cas, elle 
+--retourne -1.  
 -- -----------------------------------------------------------------------------
+-- ============================================
+-- Fonction:  f_quantite_deja_livree
+-- Description:
+--     Fonction qiu permet d'avoir la quantité de stock déjà livrée pour un produit et
+--     une commande donnée.
+-- IN (<TYPE>): Le numéro des produits (ref_produit)
+-- IN (<TYPE>): Le numéro des commandes (ref_commande)
+-- RETOUR (<TYPE>): 
+--  Retourne le nombre de stock déjà livré de chaque produit
+--  ou sinon si c'est du stock non livré c'est -1.
+-- ===========================================
+
 CREATE OR REPLACE FUNCTION f_quantite_deja_livree
 (ref_produit Livraison_Commande_Produit.no_produit%TYPE,
  ref_commande Livraison_Commande_Produit.no_commande%TYPE)
@@ -177,6 +223,7 @@ RETURN Livraison_Commande_Produit.quantite_livree%TYPE
 IS
     quant_liv Livraison_Commande_Produit.quantite_livree%TYPE;
 BEGIN
+    -- Récupératin du nombre de produit livrée pour la commande donnée.
     SELECT l.quantite_livree
     INTO quant_liv
     FROM Livraison_Commande_Produit l
@@ -185,6 +232,8 @@ BEGIN
     
     RETURN quant_liv;
         
+-- Gestion du cas où le produit n'existe pas pour cette commande.
+-- Dans ce cas, on retourne -1.
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
         quant_liv := -1;
@@ -207,53 +256,65 @@ END;
 --livrée.
 -- Affiche les informations demandés en utilisant un curseur.
 --===========================================
+--On active le output du terminal
 SET SERVEROUTPUT ON;
-
+--Création de la procédure
 CREATE OR REPLACE PROCEDURE p_afficher_client
 IS
+--Création d'un curseur qui parcour la table avec ses jointures 
 CURSOR cur_qte_livre IS     
         SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
+        --On appelle la fonction f_quantite_deja_livree pour connaitre le nombre de livraison déjà livrée
         f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
         FROM Commande
         JOIN Client ON Commande.no_client = Client.no_client
         JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
         JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
         JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
+        --Filtre les quantité qui sont déjà livrée
         WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
-
-        nom_client       Client.nom%TYPE;
+        --On déclare les variables qui va servir dans la procédure
+        nom_client       Client.nom%TYPE;    
         prenom_client    Client.prenom%TYPE;
         no_commande      Commande.no_commande%TYPE;
         ref_produit      Produit.ref_produit%TYPE;
         qte_cmd          Commande_Produit.quantite_cmd%TYPE;
         qte_livre        NUMBER;
-
+--On commence la procédure
 BEGIN
+    --On ouvre le curseur
    OPEN cur_qte_livre;
     LOOP 
-        
+        --On fetch à chaque boucle le nom,prenom,le numéro de commande, la référence du produit, la quantité de commande et la quantite livré.
         FETCH cur_qte_livre INTO nom_client, prenom_client, no_commande, ref_produit, qte_cmd, qte_livre;
+
+        --On affiche chacune des lignes
         DBMS_OUTPUT.PUT_LINE('Nom :'||nom_client ||'Prénom :'||prenom_client ||'No Commande :'|| no_commande 
         ||'Référence produit :  '|| ref_produit ||'Quantité commandé au totale : '|| qte_cmd ||'Quantité livrée : '|| qte_livre);
 
+        -- On quitte la boucle quand le curseur ne contient plus d'information
         EXIT WHEN cur_qte_livre%NOTFOUND;
     END LOOP;   
+
+    --On ferme le curseur
     CLOSE cur_qte_livre;
+    
+--C'est la fin de de la procédure
 END P_AFFICHER_CLIENT;
 /
-
-SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
-f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
-FROM Commande
-JOIN Client ON Commande.no_client = Client.no_client
-JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
-JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
-JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
-WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 
 -- -----------------------------------------------------------------------------
 -- Question 6
 -- -----------------------------------------------------------------------------
+
+-- ===========================================
+-- Procédure: p_preparer_livraison
+-- Description:
+--     Procédure qui produit et affiche un bordereau qui contient les informations du client
+--     et de tous les produits pour une commande donées ainsi que les informations de la commande.
+-- IN (NUMBER): num_livraison : le nunméro de la livraison duquel il faut préparer le bordereau
+-- ===========================================
+
 CREATE OR REPLACE PROCEDURE p_preparer_livraison (
     num_livraison NUMBER) IS 
     livraison_count NUMBER;
@@ -359,7 +420,10 @@ BEGIN
 END;
 /
 
+-- Test d'execution pour la livraison fait en 3-B
 EXECUTE p_preparer_livraison(50037);
+
+-- Test qui devrait afficher le cas où la livraison n'existe pas
 EXECUTE p_preparer_livraison(99999);
 
 -- -----------------------------------------------------------------------------
