@@ -545,9 +545,16 @@ END;
 /  
 
 
--- -----------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------------
 -- Question 8
--- -----------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------------
+-- ===========================================
+-- Procédure: p_affiche_fature
+-- Description:
+--     Affiche l’état d’une facture dont l’identifiant est passé comme paramètre. La procédure affiche le montant total à payer, 
+--     le montant déjà payé, le montant qui reste à payer et finalement un message pour indiquer l'état de la facture.
+-- IN (NUMBER): id : l'id de la facture qu'on souhaite afficher
+-- ===========================================
 SET SERVEROUTPUT ON;
 CREATE OR REPLACE PROCEDURE p_affiche_facture
     (id     IN     NUMBER) 
@@ -582,3 +589,18 @@ END;
 /
 
 EXECUTE p_affiche_facture(60023);
+--------------------------------------
+------------RÉSULTAT------------------
+--------------------------------------
+-- Pour la facture 60021 :
+--  -Montant à payer   :14635 $
+--  -Montant déjà payé :12650 $
+--  -Montant restant à payer  :1985 $
+-- Paiement non complété - Solde en souffrance : Date limite de paiement: 17-FÉVR.-2023
+
+-- Pour la facture 60023 :
+--  -Montant à payer   :798 $
+--  -Montant déjà payé :917,7 $
+--  -Montant restant à payer  :-119,7 $
+-- Paiement est complété
+--------------------------------------
