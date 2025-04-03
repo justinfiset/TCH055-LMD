@@ -64,6 +64,20 @@ END;
 -- -----------------------------------------------------------------------------
 -- Question 2
 -- -----------------------------------------------------------------------------
+-- ===========================================
+-- DÉCLENCHEUR: trg_auto_approvisionnement
+-- TABLE: Produit
+-- TYPE: Après une mise à jour
+-- DESCRIPTION:
+--     Déclenche automatiquement une commande d’approvisionnement lorsque la quantité en stock
+--     d’un produit passe sous le seuil défini.
+--     Insère un nouvel enregistrement dans la table Approvisionnement en commandant une quantité
+--     égale au seuil minimum + 10%.
+--     Vérifie qu’aucune commande d’approvisionnement n’est déjà en cours pour ce produit.
+--     Une fois le produit approvisionné, la demande correspondante est supprimée de la table 
+--     Approvisionnement.
+-- ===========================================
+
 CREATE OR REPLACE TRIGGER trg_auto_approvisionnement
 AFTER UPDATE ON Produit
 FOR EACH ROW
@@ -451,6 +465,16 @@ EXECUTE p_preparer_livraison(99999);
 -- -----------------------------------------------------------------------------
 -- Question 7
 -- -----------------------------------------------------------------------------
+-- ===========================================
+-- Procédure: P_produire_facture
+-- Description:
+--     Génère et affiche la facture d'une livraison en affichant les détails du client, de la livraison et des produits livrés. 
+--     La facture inclut également les montants avant taxes, la remise appliquée, la taxe et le montant total à payer. 
+--     La procédure insère la facture dans la base de données.
+-- IN (NUMBER): num_livraison : Le numéro de la livraison concernée.
+-- IN (NUMBER): remise : Pourcentage de remise appliqué (entre 0 et 20%).
+-- ===========================================
+
 CREATE OR REPLACE PROCEDURE P_produire_facture(
     p_id_livraison IN NUMBER,
     p_remise IN NUMBER DEFAULT 0
@@ -468,7 +492,6 @@ CREATE OR REPLACE PROCEDURE P_produire_facture(
     v_total_taxes NUMBER;
     v_montant_total NUMBER;
     
-    -- Cursor for fetching delivered products
     CURSOR cur_produits IS
         SELECT p.ref_produit, p.nom_produit, p.marque, p.prix_unitaire, lc.quantite_livree
         FROM Livraison_Commande_Produit lc
@@ -476,7 +499,6 @@ CREATE OR REPLACE PROCEDURE P_produire_facture(
         WHERE lc.no_livraison = p_id_livraison;
     
 BEGIN
-    -- Check if the delivery exists
     BEGIN
         SELECT c.no_client, c.nom, c.prenom, c.telephone, 
                a.nom_rue || ', ' || a.ville || ', ' || a.pays AS adresse, l.date_livraison
@@ -487,29 +509,24 @@ BEGIN
         JOIN Client c ON co.no_client = c.no_client
         JOIN Adresse a ON c.id_adresse = a.id_adresse
         WHERE l.no_livraison = p_id_livraison
-        AND ROWNUM = 1; -- ✅ FIXED: Ensures only one row is selected
+        AND ROWNUM = 1; 
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
             DBMS_OUTPUT.PUT_LINE('Erreur : Livraison introuvable.');
             RETURN;
     END;
     
-    -- Calculate payment deadline (30 days after delivery)
     v_date_limite := v_date_livraison + 30;
 
-    -- Calculate total before discount
     FOR r IN cur_produits LOOP
         v_total := v_total + (r.prix_unitaire * r.quantite_livree);
     END LOOP;
 
-    -- Apply discount
     v_total_apres_remise := v_total * (1 - p_remise / 100);
 
-    -- Calculate taxes and total amount
     v_total_taxes := v_total_apres_remise * 0.15;
     v_montant_total := v_total_apres_remise + v_total_taxes;
 
-    -- Generate invoice ID using sequence
     BEGIN
         SELECT SEQ_FACTURE.NEXTVAL INTO v_id_facture FROM DUAL;
     EXCEPTION
@@ -518,11 +535,9 @@ BEGIN
             RETURN;
     END;
 
-    -- Insert invoice into the database
     INSERT INTO Facture (id_facture, no_livraison, date_facture, remise, montant, taxe)
     VALUES (v_id_facture, p_id_livraison, SYSDATE, p_remise, v_total_apres_remise, v_total_taxes);
 
-    -- Print the invoice
     DBMS_OUTPUT.PUT_LINE('----------------------------------------------------');
     DBMS_OUTPUT.PUT_LINE('                 FACTURE D''ACHAT                  ');
     DBMS_OUTPUT.PUT_LINE('----------------------------------------------------');
@@ -565,7 +580,33 @@ BEGIN
     P_produire_facture(50037, 20);
 END;
 /  
-
+------------------------------------------------------
+--                 FACTURE D'ACHAT                  
+----------------------------------------------------
+--No Client     : 100
+--Nom           : tremblay
+--Prénom        : michel
+--Téléphone     : 514 123 4578
+--Adresse       : rue principale, Montreal, CANADA
+--No Livraison  : 50037
+--Date Livraison: 27-FEB-23
+--Date Facturation : 03-APR-25
+--Date Limite Paiement : 29-MAR-23
+----------------------------------------------------
+--No Produit | Nom Produit | Marque | Prix | Quantité | Total
+----------------------------------------------------
+--PC2000 | Inspiron-5 | DELL | 1320 | 4 | 5280
+--LT2011 | Prolite | HP | 2100 | 1 | 2100
+--SC2001 | VS-5433 | viewsonic | 475 | 3 | 1425
+--DD2001 | IO-IDE | IOMEGA | 399 | 2 | 798
+--DD2002 | IO-SSD | IOMEGA | 890 | 2 | 1780
+----------------------------------------------------
+--Montant         : 11383
+--Remise          : 2276.6
+--Montant réduit  : 9106.4
+--Taxes           : 1365.96
+--Total à payer   : 10472.36
+----------------------------------------------------
 
 -- -----------------------------------------------------------------------------------
 -- Question 8
