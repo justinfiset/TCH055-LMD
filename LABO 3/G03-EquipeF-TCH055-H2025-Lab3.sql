@@ -1,30 +1,27 @@
 -- ===================================================================
 -- Auteurs : Justin Fiset, Aimé Melançon, Nikola Sunjka, Justin Lavoie-Ladouceur
 
--- Description : 
---
+-- Description : Laboratoire 3 du cours TCH055 : Les données de l’entreprise de ventre de produits
+-- informatiques, écriture des triggers, fonctions et procédures PL/SQL
 -- ====================================================================
 
 -- -----------------------------------------------------------------------------
 -- Question 1  :
---Implémenter un déclencheur qui met à jour la quantité en stock d’un produit qui sera livré. Il faut que 
---votre déclencheur vérifie en premier, si la quantité en stock est suffisante. Si ce n’est pas le cas, le 
---déclencheur lève une exception nommée E_STOCK_INSUFFISANT. 
---Indication : lorsqu’un un produit est destiné à être livré, il y aura une insertion d’un tuple dans la table 
---Livraison_Commande_Produit.  
---Note : Pour simplification, on ne traite pas les modifications dans la quantité à livrer, car dans ce cas, 
---la mise à jour de la quantité en stock est différente.
+-- Implémenter un déclencheur qui met à jour la quantité en stock d’un produit qui sera livré. Il faut que 
+-- votre déclencheur vérifie en premier, si la quantité en stock est suffisante. Si ce n’est pas le cas, le 
+--  déclencheur lève une exception nommée E_STOCK_INSUFFISANT. 
+-- Indication : lorsqu’un un produit est destiné à être livré, il y aura une insertion d’un tuple dans la table 
+-- Livraison_Commande_Produit.  
+-- Note : Pour simplification, on ne traite pas les modifications dans la quantité à livrer, car dans ce cas, 
+-- la mise à jour de la quantité en stock est différente.
 -------------------------------------------------------------------------------------
---
---DECLENCHEUR: TRG_qte_stock
---TABLE: Commande_Produit
---TYPE: En même temps qu'une mise à jours
---DESCRIPTION:
--- Vérifie si le stock du produit n'est pas inférieur à zéro. Si la quantité du stock n'est pas 
---suffisante le déclencheur lève une exception nommée E_STOCK_INSUFFISANT. Si la quantité du stock 
---est suffisante il va avoir une insertion d'un tuple dans la table Livraison_Commande_Produit.
---
---
+-- DECLENCHEUR: TRG_qte_stock
+-- TABLE: Commande_Produit
+-- TYPE: En même temps qu'une mise à jours
+-- DESCRIPTION:
+--     Vérifie si le stock du produit n'est pas inférieur à zéro. Si la quantité du stock n'est pas 
+--     suffisante le déclencheur lève une exception nommée E_STOCK_INSUFFISANT. Si la quantité du stock 
+--     est suffisante il va avoir une insertion d'un tuple dans la table Livraison_Commande_Produit.
 --------------------------------------------------------------------------------------
 CREATE OR REPLACE TRIGGER trg_qte_stock 
 AFTER UPDATE ON commande_produit
@@ -99,6 +96,16 @@ END;
 -- -----------------------------------------------------------------------------
 -- Question 3-A
 -- -----------------------------------------------------------------------------
+-- ===========================================
+-- DECLENCHEUR: trg_stat_vente
+-- TABLE: Livraison_Commande_Produitt
+-- TYPE: Après une insertion
+-- DESCRIPTION:
+--     Met à jours la table Statistique_Vente après chaque livraison d'un article.
+--     On ajoute le nombre de produits livrées aux statistiques d'un produit pour le mois courant.
+--     Si aucune statistique pour ce produit n'existe pour le moment, on insère le nombre de produit livrée
+--     directement dans la table.
+-- ===========================================
 CREATE OR REPLACE TRIGGER trg_stat_vente
 AFTER INSERT
 ON Livraison_Commande_Produit
@@ -106,7 +113,8 @@ ON Livraison_Commande_Produit
 FOR EACH ROW
 DECLARE
     nb_stat NUMBER(10);
-    date_livraison DATE := SYSDATE;
+    -- Récupéraiton de la date courante
+    date_livraison DATE := SYSDATE; 
 BEGIN
     -- Vérification si la statistique existe
     SELECT COUNT(*)
@@ -115,10 +123,13 @@ BEGIN
     WHERE ref_produit = :NEW.no_produit;
     
 IF nb_stat > 0 THEN
+    -- Si la statistique existe déjà, on ajoute le nombre de produit livrée au total de vendue.
     UPDATE Statistique_Vente
     SET quantite_vendue = quantite_vendue + :NEW.quantite_livree
     WHERE Statistique_Vente.ref_produit = :NEW.no_produit;
 ELSE
+    -- Si le produit n'existe pas, on met directement le nombre de produit livrée dans
+    -- une nouvelle ligne.
     INSERT INTO Statistique_Vente(ref_produit, code_mois, quantite_vendue)
     VALUES (:NEW.no_produit, extract(month FROM date_livraison), :NEW.quantite_livree);
 END IF;
