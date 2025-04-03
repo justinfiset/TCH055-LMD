@@ -289,9 +289,7 @@ BEGIN
         FETCH cur_qte_livre INTO nom_client, prenom_client, no_commande, ref_produit, qte_cmd, qte_livre;
 
         --On affiche chacune des lignes
-        DBMS_OUTPUT.PUT_LINE('Nom :'||nom_client ||'Prénom :'||prenom_client ||'No Commande :'|| no_commande 
-        ||'Référence produit :  '|| ref_produit ||'Quantité commandé au totale : '|| qte_cmd ||'Quantité livrée : '|| qte_livre);
-
+        DBMS_OUTPUT.PUT_LINE('Nom :'||nom_client ||', Prénom :'||prenom_client ||', No_Commande :'|| no_commande ||', Référence produit :  '|| ref_produit ||', Quantité commandé au totale : '|| qte_cmd ||', Quantité livrée : '|| qte_livre);
         -- On quitte la boucle quand le curseur ne contient plus d'information
         EXIT WHEN cur_qte_livre%NOTFOUND;
     END LOOP;   
@@ -302,6 +300,50 @@ BEGIN
 --C'est la fin de de la procédure
 END P_AFFICHER_CLIENT;
 /
+
+
+EXECUTE p_afficher_client();
+
+--Sortie 
+--Nom :tremblay, Prénom :michel, No Commande :30, Référence produit :  DD2002, Quantité commandé au totale : 8, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :30, Référence produit :  PC2000, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :tremblay, Prénom :michel, No Commande :30, Référence produit :  DD2002, Quantité commandé au totale : 8, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :30, Référence produit :  PC2000, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :tremblay, Prénom :michel, No Commande :32, Référence produit :  SC2002, Quantité commandé au totale : 5, Quantité livrée : 5
+--Nom :tremblay, Prénom :michel, No Commande :32, Référence produit :  LT2011, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :32, Référence produit :  SC2002, Quantité commandé au totale : 5, Quantité livrée : 5
+--Nom :tremblay, Prénom :michel, No Commande :32, Référence produit :  LT2011, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :Polo, Prénom :marco, No Commande :31, Référence produit :  LT2011, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :Polo, Prénom :marco, No Commande :31, Référence produit :  PC2000, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :Polo, Prénom :marco, No Commande :31, Référence produit :  PC2000, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :Polo, Prénom :marco, No Commande :31, Référence produit :  LT2011, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :Jean, Prénom :jardin, No Commande :33, Référence produit :  DD2001, Quantité commandé au totale : 3, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  SC2001, Quantité commandé au totale : 3, Quantité livrée : 3
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2002, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  PC2000, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  LT2011, Quantité commandé au totale : 1, Quantité livrée : 1
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2001, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2001, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  SC2001, Quantité commandé au totale : 3, Quantité livrée : 3
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2002, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  PC2000, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  LT2011, Quantité commandé au totale : 1, Quantité livrée : 1
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2001, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  SC2001, Quantité commandé au totale : 3, Quantité livrée : 3
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2002, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  PC2000, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  LT2011, Quantité commandé au totale : 1, Quantité livrée : 1
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2001, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  SC2001, Quantité commandé au totale : 3, Quantité livrée : 3
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2002, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  PC2000, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  LT2011, Quantité commandé au totale : 1, Quantité livrée : 1
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2001, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  SC2001, Quantité commandé au totale : 3, Quantité livrée : 3
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2002, Quantité commandé au totale : 2, Quantité livrée : 2
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  PC2000, Quantité commandé au totale : 4, Quantité livrée : 4
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  LT2011, Quantité commandé au totale : 1, Quantité livrée : 1
+--Nom :tremblay, Prénom :michel, No Commande :37, Référence produit :  DD2001, Quantité commandé au totale : 2, Quantité livrée : 2
 
 -- -----------------------------------------------------------------------------
 -- Question 6
@@ -425,6 +467,28 @@ EXECUTE p_preparer_livraison(50037);
 
 -- Test qui devrait afficher le cas où la livraison n'existe pas
 EXECUTE p_preparer_livraison(99999);
+
+--Sortie :
+
+--No Client : 100
+--Nom       : tremblay
+--Prénom    : michel
+--Téléphone : 514 123 4578
+--Adresse   : 123, rue principale, Montreal, H1H 2H2. CANADA
+--No Livraison   : 50037
+--Date Livraison : 27/02/23
+---------------------------------------------------------------------------------------
+--No Produit  Nom Produit           Marque                Q. Livrée   No CMD.  Date CMD.   
+---------------------------------------------------------------------------------------
+--DD2001      IO-IDE                IOMEGA                2           37       27/02/23    
+--DD2002      IO-SSD                IOMEGA                2           37       27/02/23    
+--LT2011      Prolite               HP                    1           37       27/02/23    
+--PC2000      Inspiron-5            DELL                  4           37       27/02/23    
+--SC2001      VS-5433               viewsonic             3           37       27/02/23    
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+
 
 -- -----------------------------------------------------------------------------
 -- Question 7
