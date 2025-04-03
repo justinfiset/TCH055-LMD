@@ -252,49 +252,52 @@ END;
 --livrée.
 -- Affiche les informations demandés en utilisant un curseur.
 --===========================================
+--On active le output du terminal
 SET SERVEROUTPUT ON;
-
+--Création de la procédure
 CREATE OR REPLACE PROCEDURE p_afficher_client
 IS
+--Création d'un curseur qui parcour la table avec ses jointures 
 CURSOR cur_qte_livre IS     
         SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
+        --On appelle la fonction f_quantite_deja_livree pour connaitre le nombre de livraison déjà livrée
         f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
         FROM Commande
         JOIN Client ON Commande.no_client = Client.no_client
         JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
         JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
         JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
+        --Filtre les quantité qui sont déjà livrée
         WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
-
-        nom_client       Client.nom%TYPE;
+        --On déclare les variables qui va servir dans la procédure
+        nom_client       Client.nom%TYPE;    
         prenom_client    Client.prenom%TYPE;
         no_commande      Commande.no_commande%TYPE;
         ref_produit      Produit.ref_produit%TYPE;
         qte_cmd          Commande_Produit.quantite_cmd%TYPE;
         qte_livre        NUMBER;
-
+--On commence la procédure
 BEGIN
+    --On ouvre le curseur
    OPEN cur_qte_livre;
     LOOP 
-        
+        --On fetch à chaque boucle le nom,prenom,le numéro de commande, la référence du produit, la quantité de commande et la quantite livré.
         FETCH cur_qte_livre INTO nom_client, prenom_client, no_commande, ref_produit, qte_cmd, qte_livre;
+
+        --On affiche chacune des lignes
         DBMS_OUTPUT.PUT_LINE('Nom :'||nom_client ||'Prénom :'||prenom_client ||'No Commande :'|| no_commande 
         ||'Référence produit :  '|| ref_produit ||'Quantité commandé au totale : '|| qte_cmd ||'Quantité livrée : '|| qte_livre);
 
+        -- On quitte la boucle quand le curseur ne contient plus d'information
         EXIT WHEN cur_qte_livre%NOTFOUND;
     END LOOP;   
+
+    --On ferme le curseur
     CLOSE cur_qte_livre;
+    
+--C'est la fin de de la procédure
 END P_AFFICHER_CLIENT;
 /
-
-SELECT Client.nom, Client.prenom,Commande.no_commande, Produit.ref_produit, Commande_Produit.quantite_cmd, 
-f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande) AS qte_livre
-FROM Commande
-JOIN Client ON Commande.no_client = Client.no_client
-JOIN Commande_Produit ON Commande.no_commande = Commande_Produit.no_commande
-JOIN Produit ON Commande_Produit.no_produit = Produit.ref_produit
-JOIN Livraison_Commande_Produit ON Commande_Produit.no_commande = Livraison_Commande_Produit.no_commande
-WHERE f_quantite_deja_livree(Produit.ref_produit, Commande.no_commande)>0;
 
 -- -----------------------------------------------------------------------------
 -- Question 6
