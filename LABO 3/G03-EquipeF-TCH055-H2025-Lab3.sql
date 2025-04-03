@@ -422,9 +422,31 @@ END;
 
 -- Test d'execution pour la livraison fait en 3-B
 EXECUTE p_preparer_livraison(50037);
+------------RÉSULTAT------------------
+-- No Client : 100
+-- Nom       : tremblay
+-- Prénom    : michel
+-- Téléphone : 514 123 4578
+-- Adresse   : 123, rue principale, Montreal, H1H 2H2. CANADA
+-- No Livraison   : 50037
+-- Date Livraison : 23-02-27
+-- ---------------------------------------------------------------------------------------
+-- No Produit  Nom Produit           Marque                Q. Livrée   No CMD.  Date CMD.   
+-- ---------------------------------------------------------------------------------------
+-- DD2001      IO-IDE                IOMEGA                2           37       23-02-27    
+-- DD2002      IO-SSD                IOMEGA                2           37       23-02-27    
+-- LT2011      Prolite               HP                    1           37       23-02-27    
+-- PC2000      Inspiron-5            DELL                  4           37       23-02-27    
+-- SC2001      VS-5433               viewsonic             3           37       23-02-27    
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
 
 -- Test qui devrait afficher le cas où la livraison n'existe pas
 EXECUTE p_preparer_livraison(99999);
+------------RÉSULTAT------------------
+-- Erreur: la livraison 99999 n'existe pas.
+
 
 -- -----------------------------------------------------------------------------
 -- Question 7
