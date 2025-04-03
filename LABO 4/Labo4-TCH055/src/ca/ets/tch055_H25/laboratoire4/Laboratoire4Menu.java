@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.Scanner;
 
 
@@ -72,9 +73,57 @@ public class Laboratoire4Menu {
      *  Option 2 - Ajouter un produit
      *   
      */
-    public static void ajouterProduit() { 
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 2 : ajouterProduit() n'est pas implémentée");
+    public static void ajouterProduit() {
+		Scanner sc = new Scanner(System.in);
+
+		try {
+			System.out.print("Veuillez saisir le numéro de référence : ");
+			String ref = sc.nextLine();
+
+			System.out.print("Veuillez saisir le nom du produit : ");
+			String nom = sc.nextLine();
+
+			System.out.print("Veuillez saisir la marque : ");
+			String marque = sc.nextLine();
+
+			System.out.print("Veuillez saisir le prix unitaire : ");
+			double prix = Double.parseDouble(sc.nextLine());
+
+			System.out.print("Veuillez saisir la quantité en stock : ");
+			int stock = Integer.parseInt(sc.nextLine());
+
+			System.out.print("Veuillez saisir la quantité seuil : ");
+			int seuil = Integer.parseInt(sc.nextLine());
+
+			System.out.print("Veuillez saisir la code de la catégorie : ");
+			String nom_categorie = sc.nextLine();
+
+			System.out.print("Veuillez saisir le code fournisseur prioritaire : ");
+			int fournisseur = Integer.parseInt(sc.nextLine());
+
+			PreparedStatement requete = connexion.prepareStatement("INSERT INTO Produit(ref_produit, " +
+					"nom_produit, marque, prix_unitaire, quantite_stock, quantite_seuil, nom_categorie, code_fournisseur_prioritaire)" +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+			requete.setString(1, ref);
+			requete.setString(2, nom);
+			requete.setString(3, marque);
+			requete.setDouble(4, prix);
+			requete.setInt(5, stock);
+			requete.setInt(6, seuil);
+			requete.setString(7, nom_categorie);
+			requete.setInt(8, fournisseur);
+
+			requete.executeUpdate();
+
+			System.out.println("Produit ajouté avec succes!");
+			System.out.println("Appuyer sur ENTER pour continuer...");
+			sc.nextLine();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("Vous avez entrées des informations invalides. Veuillez recommencer.");
+		}
     }
  
     /**
