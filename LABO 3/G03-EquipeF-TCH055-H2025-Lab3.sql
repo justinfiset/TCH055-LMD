@@ -191,7 +191,7 @@ BEGIN
             ROLLBACK;
             dbms_output.put_line('Quantité insuffisante pour la livraison!');
 END;
-/
+/   
 
 -- Test d'execution de la question 3-B
 EXECUTE p_test_creation_livraison;
@@ -207,7 +207,8 @@ EXECUTE p_test_creation_livraison;
 -- ============================================
 -- Fonction:  f_quantite_deja_livree
 -- Description:
--- Permet d'avoir la quantité de stock déjà livrée.
+--     Fonction qiu permet d'avoir la quantité de stock déjà livrée pour un produit et
+--     une commande donnée.
 -- IN (<TYPE>): Le numéro des produits (ref_produit)
 -- IN (<TYPE>): Le numéro des commandes (ref_commande)
 -- RETOUR (<TYPE>): 
@@ -222,6 +223,7 @@ RETURN Livraison_Commande_Produit.quantite_livree%TYPE
 IS
     quant_liv Livraison_Commande_Produit.quantite_livree%TYPE;
 BEGIN
+    -- Récupératin du nombre de produit livrée pour la commande donnée.
     SELECT l.quantite_livree
     INTO quant_liv
     FROM Livraison_Commande_Produit l
@@ -230,6 +232,8 @@ BEGIN
     
     RETURN quant_liv;
         
+-- Gestion du cas où le produit n'existe pas pour cette commande.
+-- Dans ce cas, on retourne -1.
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
         quant_liv := -1;
@@ -276,11 +280,9 @@ CURSOR cur_qte_livre IS
 BEGIN
    OPEN cur_qte_livre;
     LOOP 
-        
         FETCH cur_qte_livre INTO nom_client, prenom_client, no_commande, ref_produit, qte_cmd, qte_livre;
         DBMS_OUTPUT.PUT_LINE('Nom :'||nom_client ||'Prénom :'||prenom_client ||'No Commande :'|| no_commande 
         ||'Référence produit :  '|| ref_produit ||'Quantité commandé au totale : '|| qte_cmd ||'Quantité livrée : '|| qte_livre);
-
         EXIT WHEN cur_qte_livre%NOTFOUND;
     END LOOP;   
     CLOSE cur_qte_livre;
