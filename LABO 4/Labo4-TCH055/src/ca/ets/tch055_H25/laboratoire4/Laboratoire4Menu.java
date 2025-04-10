@@ -176,9 +176,29 @@ public class Laboratoire4Menu {
      * @param numFacture : numéro de la facture pour laquelle est fait le paiement
      * 
      */
-    public static void enregistrerPaiement(int numFacture) { 
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 5 : enregistrerPaiement() n'est pas implémentée");
+    public static void enregistrerPaiement(int numFacture) {
+		// TODO vérifier si la facture existe, afficher un message
+	    try {
+		    Statement request = connexion.createStatement();
+			ResultSet results = request.executeQuery("SELECT * FROM Facture WHERE id_facture=?");
+	    }
+
+
+		float paiementTotal = calculerPaiements(numFacture, false);
+
+		// récup du type de paiement de l'utilisateur
+		Scanner sc = new Scanner(System.in);
+	    System.out.print("Veuillez choisir un type de paiement ");
+		String typePaiement = sc.nextLine();
+
+		switch (typePaiement.toUpperCase()) { // On ignore la case pour le type
+			case "CASH":
+				break;
+			case "CHEQUE":
+				break;
+			case "CREDIT":
+				break;
+		}
     }
 
     /**
