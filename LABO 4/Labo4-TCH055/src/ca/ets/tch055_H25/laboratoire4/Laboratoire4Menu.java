@@ -55,7 +55,7 @@ public class Laboratoire4Menu {
 	 */
     public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
 	    Class.forName("oracle.jdbc.driver.OracleDriver");
-    	Connection une_connexion = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "tp4", "tp4");
+    	Connection une_connexion = DriverManager.getConnection(uri, login, password);
     	return une_connexion  ; 
     }
     
@@ -66,29 +66,30 @@ public class Laboratoire4Menu {
     public static void listerProduits(Connection connJdbc) {
 	try{
 	Statement requete = connJdbc.createStatement();
-		System.out.println("--------------------------------------------------------------------");
-		System.out.print("Référence");
-		System.out.print("NOM");
-		System.out.print("MARQUE");
-		System.out.print("Prix Unitaire");
-		System.out.print("Quantité");
-		System.out.print("Seuil");
-		System.out.print("Statue");
-		System.out.println("Code fournisseur");
-		System.out.println("--------------------------------------------------------------------");
 		ResultSet resultats = requete.executeQuery(
-			"SELECT * FROM Produit"
+			"SELECT * FROM Produit ORDER BY ref_produit ASC"
 		);
-		while(resultats.next()){
-			System.out.println(resultats.getString("ref_produit"));
-			System.out.print(resultats.getString("nom_produit"));
-			System.out.print(resultats.getString("marque"));
-			System.out.print(resultats.getInt("prix_unitaire"));
-			System.out.print(resultats.getInt("quantite_stock"));
-			System.out.print(resultats.getInt("quantite_seuil"));
-			System.out.print(resultats.getString("statue_produit"));
-			System.out.print(resultats.getInt("code_fournisseur_prioritaire"));
+		System.out.println("--------------------------------------------------------------------------------------------");
+		System.out.printf("%-10s %-15s %-15s %-15s %-10s %-8s %-10s %-10s\n",
+				"Référence", "NOM", "MARQUE", "Prix Unitaire", "Quantité", "Seuil", "Statut", "Code four.");
+		System.out.println("--------------------------------------------------------------------------------------------");
+
+		while (resultats.next()) {
+			String ref = resultats.getString("ref_produit");
+			String nom = resultats.getString("nom_produit");
+			String marque = resultats.getString("marque");
+			double prix = resultats.getDouble("prix_unitaire");
+			int quantite = resultats.getInt("quantite_stock");
+			int seuil = resultats.getInt("quantite_seuil");
+			String statut = resultats.getString("statut_produit");
+			int codeFournisseur = resultats.getInt("code_fournisseur_prioritaire");
+
+			System.out.printf("%-10s %-15s %-15s %-15.1f %-10d %-8d %-10s %-10d\n",
+					ref, nom, marque, prix, quantite, seuil, statut, codeFournisseur);
 		}
+		System.out.println("--------------------------------------------------------------------------------------------");
+		System.out.println("Appuyer sur ENTER pour continuer...");
+		new java.util.Scanner(System.in).nextLine();
 	}catch (SQLException e){
 		System.out.println(e);
     	System.out.println("Option 1 : listerProduits() n'est pas implémentée");
@@ -275,10 +276,10 @@ public class Laboratoire4Menu {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException{
 		
 		// Mettre les informations de votre compte sur SGBD Oracle 
-		String username = "Nikola" ;
-		String motDePasse = "jB516413" ;
+		String username = "tp4" ;
+		String motDePasse = "tp4" ;
 		
-		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;   
+		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;
 		
 		// Appel de le méthode pour établir la connexion avec le SGBD 
 		connexion = connexionBDD(username , motDePasse , uri ) ;
@@ -297,7 +298,7 @@ public class Laboratoire4Menu {
            	
                 if(choix.equals("1")){
  
-                    listerProduits() ; 
+                    listerProduits(connexion) ;
                     
                  }else if(choix.equals("2")){
  
