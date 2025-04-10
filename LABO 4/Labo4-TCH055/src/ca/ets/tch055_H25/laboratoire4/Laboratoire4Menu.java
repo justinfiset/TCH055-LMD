@@ -1,5 +1,6 @@
 package ca.ets.tch055_H25.laboratoire4;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,68 +13,68 @@ import java.util.Scanner;
  * Classe principale du laboratoire 4
  * Contient un ensemble de méthodes statique pour 
  * la manipulation de la BD Produit 
- *
+ *  
  * @author Pamella Kissok
  * @author Inoussa Legrene
  * @author Amal Ben Abdellah
- *
+ * 
  * @equipe : XX
- *
+ * 
  * @author
  * @author
  * @author
  * @author
- *
+ * 
  * @version 2
  *
  */
 public class Laboratoire4Menu {
-
+	
 	public static Statement statmnt = null;
-
-	/* Référence vers l'objer de connection à la BD*/
+	
+	/* Référence vers l'objer de connection à la BD*/ 
 	public static Connection connexion = null;
-
-	/* Chargement du pilote Oracle */
+	
+	/* Chargement du pilote Oracle */ 
 	static {
-		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-		} catch (ClassNotFoundException e) {
-
-			e.printStackTrace();
-		}
+	   try {
+		   Class.forName("oracle.jdbc.driver.OracleDriver");
+	   } catch (ClassNotFoundException e) {
+		
+		   e.printStackTrace();
+	   }
 	}
-
+	
 	/**
 	 * Question : Ouverture de la connection
-	 *
+	 * 
 	 * @param login
 	 * @param password
 	 * @param uri
 	 * @return
-	 * @throws SQLException
+	 * @throws SQLException 
 	 */
-	public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
-		Class.forName("oracle.jdbc.driver.OracleDriver");
-		Connection une_connexion = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "tp4", "tp4");
-		return une_connexion  ;
-	}
-
-	/**
-	 *  Option 1 - lister les produits
-	 * @throws SQLException
-	 */
-	public static void listerProduits() {
-		// Ligne suivante à supprimer après implémentation
-		System.out.println("Option 1 : listerProduits() n'est pas implémentée");
-
-	}
-
-	/**
-	 *  Option 2 - Ajouter un produit
-	 *
-	 */
-	public static void ajouterProduit() {
+    public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
+	    Class.forName("oracle.jdbc.driver.OracleDriver");
+    	Connection une_connexion = DriverManager.getConnection(uri, login, password);
+    	return une_connexion  ;
+    }
+    
+    /**
+     *  Option 1 - lister les produits 
+     * @throws SQLException 
+     */
+    public static void listerProduits() {
+    	// Ligne suivante à supprimer après implémentation
+    	System.out.println("Option 1 : listerProduits() n'est pas implémentée");  
+    	
+    }
+    
+    /**
+     *  Option 2 - Ajouter un produit
+     *   
+     */
+    public static void ajouterProduit() {
 		Scanner sc = new Scanner(System.in);
 
 		try {
@@ -124,18 +125,33 @@ public class Laboratoire4Menu {
 		} catch (Exception e) {
 			System.out.println("Vous avez entrées des informations invalides. Veuillez recommencer.");
 		}
-	}
-
-	/**
-	 * Option 3 : Affiche la Commande et ses items
-	 *
-	 * @param numCommande : numéro de la commande à afficher
-	 *
-	 */
-	public static void afficherCommande(int numCommande) {
-		// Ligne suivante à supprimer après implémentation
-		System.out.println("Option 3 : afficherCommande() n'est pas implémentée");
-	}
+    }
+ 
+    /**
+     * Option 3 : Affiche la Commande et ses items 
+     *  
+     * @param numCommande : numéro de la commande à afficher 
+     * 
+     */
+    public static void afficherCommande(int numCommande) throws SQLException {
+    	// Ligne suivante à supprimer après implémentation
+    	System.out.println("Option 3 : afficherCommande() n'est pas implémentée");
+		PreparedStatement requete = connexion.prepareStatement(
+				"SELECT * FROM Client c " +
+						"JOIN Commande co ON c.no_client=co.no_client " +
+						"WHERE no_commande=?");
+		requete.setInt( 1, numCommande);
+		ResultSet result = requete.executeQuery();
+		System.out.println("Client	    : " + result.getString("prenom") + result.getString("nom") + "\n" +
+						   "Téléphone   : " + result.getString("telephone") + "\n" +
+						   "No Commande : " + String.valueOf(result.getInt("no_commande")) + "\n" +
+						   "Date        : " + result.getDate("date_commande") + "\n" +
+						   "Statut      : " + result.getString("statut") + "\n" +
+						   "----------------------------------------------------------------------------------------\n" +
+						   "Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
+						   "----------------------------------------------------------------------------------------");
+		//Ajouter liste produits
+    }   
 
 	/**
 	 * Option 4 : Calcule le total des paiements effectués pour une facture
@@ -277,12 +293,12 @@ public class Laboratoire4Menu {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException{
 
 		// Mettre les informations de votre compte sur SGBD Oracle 
-		String username = "LE_VOTRE" ;
-		String motDePasse = "LE_VOTRE" ;
-
-		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;
-
-		// Appel de la méthode pour établir la connexion avec le SGBD
+		String username = "tp4" ;
+		String motDePasse = "tp4" ;
+		
+		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;   
+		
+		// Appel de le méthode pour établir la connexion avec le SGBD 
 		connexion = connexionBDD(username , motDePasse , uri ) ;
 
 		if (connexion != null) {
