@@ -13,68 +13,68 @@ import java.util.Scanner;
  * Classe principale du laboratoire 4
  * Contient un ensemble de méthodes statique pour 
  * la manipulation de la BD Produit 
- *  
+ *
  * @author Pamella Kissok
  * @author Inoussa Legrene
  * @author Amal Ben Abdellah
- * 
+ *
  * @equipe : XX
- * 
+ *
  * @author
  * @author
  * @author
  * @author
- * 
+ *
  * @version 2
  *
  */
 public class Laboratoire4Menu {
-	
+
 	public static Statement statmnt = null;
-	
-	/* Référence vers l'objer de connection à la BD*/ 
+
+	/* Référence vers l'objer de connection à la BD*/
 	public static Connection connexion = null;
-	
-	/* Chargement du pilote Oracle */ 
+
+	/* Chargement du pilote Oracle */
 	static {
-	   try {
-		   Class.forName("oracle.jdbc.driver.OracleDriver");
-	   } catch (ClassNotFoundException e) {
-		
-		   e.printStackTrace();
-	   }
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		} catch (ClassNotFoundException e) {
+
+			e.printStackTrace();
+		}
 	}
-	
+
 	/**
 	 * Question : Ouverture de la connection
-	 * 
+	 *
 	 * @param login
 	 * @param password
 	 * @param uri
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
-    public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
-	    Class.forName("oracle.jdbc.driver.OracleDriver");
-    	Connection une_connexion = DriverManager.getConnection(uri, login, password);
-    	return une_connexion  ;
-    }
-    
-    /**
-     *  Option 1 - lister les produits 
-     * @throws SQLException 
-     */
-    public static void listerProduits() {
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 1 : listerProduits() n'est pas implémentée");  
-    	
-    }
-    
-    /**
-     *  Option 2 - Ajouter un produit
-     *   
-     */
-    public static void ajouterProduit() {
+	public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection une_connexion = DriverManager.getConnection(uri, login, password);
+		return une_connexion  ;
+	}
+
+	/**
+	 *  Option 1 - lister les produits
+	 * @throws SQLException
+	 */
+	public static void listerProduits() {
+		// Ligne suivante à supprimer après implémentation
+		System.out.println("Option 1 : listerProduits() n'est pas implémentée");
+
+	}
+
+	/**
+	 *  Option 2 - Ajouter un produit
+	 *
+	 */
+	public static void ajouterProduit() {
 		Scanner sc = new Scanner(System.in);
 
 		try {
@@ -125,17 +125,17 @@ public class Laboratoire4Menu {
 		} catch (Exception e) {
 			System.out.println("Vous avez entrées des informations invalides. Veuillez recommencer.");
 		}
-    }
- 
-    /**
-     * Option 3 : Affiche la Commande et ses items 
-     *  
-     * @param numCommande : numéro de la commande à afficher 
-     * 
-     */
-    public static void afficherCommande(int numCommande) throws SQLException {
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 3 : afficherCommande() n'est pas implémentée");
+	}
+
+	/**
+	 * Option 3 : Affiche la Commande et ses items
+	 *
+	 * @param numCommande : numéro de la commande à afficher
+	 *
+	 */
+	public static void afficherCommande(int numCommande) throws SQLException {
+		// Ligne suivante à supprimer après implémentation
+		System.out.println("Option 3 : afficherCommande() n'est pas implémentée");
 		PreparedStatement requete = connexion.prepareStatement(
 				"SELECT * FROM Client c " +
 						"JOIN Commande co ON c.no_client=co.no_client " +
@@ -143,15 +143,15 @@ public class Laboratoire4Menu {
 		requete.setInt( 1, numCommande);
 		ResultSet result = requete.executeQuery();
 		System.out.println("Client	    : " + result.getString("prenom") + result.getString("nom") + "\n" +
-						   "Téléphone   : " + result.getString("telephone") + "\n" +
-						   "No Commande : " + String.valueOf(result.getInt("no_commande")) + "\n" +
-						   "Date        : " + result.getDate("date_commande") + "\n" +
-						   "Statut      : " + result.getString("statut") + "\n" +
-						   "----------------------------------------------------------------------------------------\n" +
-						   "Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
-						   "----------------------------------------------------------------------------------------");
+				"Téléphone   : " + result.getString("telephone") + "\n" +
+				"No Commande : " + String.valueOf(result.getInt("no_commande")) + "\n" +
+				"Date        : " + result.getDate("date_commande") + "\n" +
+				"Statut      : " + result.getString("statut") + "\n" +
+				"----------------------------------------------------------------------------------------\n" +
+				"Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
+				"----------------------------------------------------------------------------------------");
 		//Ajouter liste produits
-    }   
+	}
 
 	/**
 	 * Option 4 : Calcule le total des paiements effectués pour une facture
@@ -195,31 +195,49 @@ public class Laboratoire4Menu {
 	 */
 	public static void enregistreEvaluation(SatisfactionData[] listEvaluation) {
 		try{
-			PreparedStatement requete = connexion.prepareStatement(
-					"INSERT INTO Satisfaction (no_client,ref_produit,note,commentaire) VALUES (?,?,?,?)"
-			);
 
-			for(SatisfactionData satisfaction : listEvaluation) {
-				requete.setInt(1,satisfaction.no_client);
-				requete.setString(2,satisfaction.ref_produit);
-				requete.setInt(3,satisfaction.note);
-				requete.setString(4,satisfaction.commentaire);
-				requete.addBatch();
-			}
-
-			int[] res = requete.executeBatch();
+			PreparedStatement evalExistant = connexion.prepareStatement("SELECT * FROM Satisfaction WHERE no_client = ? AND ref_produit = ? AND note= ? AND  commentaire = ?");
+			PreparedStatement requete = connexion.prepareStatement("INSERT INTO Satisfaction (no_client,ref_produit,note,commentaire) VALUES (?,?,?,?)");
+			PreparedStatement verifieNoClient = connexion.prepareStatement("SELECT * FROM Client WHERE no_client = ?");
+			PreparedStatement verifieRefProduit = connexion.prepareStatement("SELECT * FROM Produit WHERE ref_produit=?");
 
 			int total =0;
 
-			for(int r :res){
-				if(r >=0){
-					total+=1;
+			for (SatisfactionData satisfactionData : listEvaluation) {
+
+				verifieNoClient.setInt(1,satisfactionData.no_client);
+				verifieRefProduit.setString(1,satisfactionData.ref_produit);
+				ResultSet resultVerif1 = verifieNoClient.executeQuery();
+				ResultSet resultVerif2 = verifieRefProduit.executeQuery();
+
+				if (resultVerif1.next() && resultVerif2.next()) {
+
+					evalExistant.setInt(1,satisfactionData.no_client);
+					evalExistant.setString(2,satisfactionData.ref_produit);
+					evalExistant.setInt(3,satisfactionData.note);
+					evalExistant.setString(4,satisfactionData.commentaire);
+					ResultSet result = evalExistant.executeQuery();
+
+					if(!result.next()) {
+
+						requete.setInt(1,satisfactionData.no_client);
+						requete.setString(2,satisfactionData.ref_produit);
+						requete.setInt(3,satisfactionData.note);
+						requete.setString(4,satisfactionData.commentaire);
+						total=+1;
+						requete.addBatch();
+					}
 				}
+
 			}
-			System.out.printf("\nLe nombre d'insertion réussi est de %d\n",total);
+
+			requete.executeBatch();
+
+
+			System.out.printf("Le nombre d'insertion d'évaluation produit réussi est de %d.\n\n",total);
 
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println(e.getMessage() +'\n'+ e.getCause());
 		}
 
 
@@ -295,9 +313,9 @@ public class Laboratoire4Menu {
 		// Mettre les informations de votre compte sur SGBD Oracle 
 		String username = "tp4" ;
 		String motDePasse = "tp4" ;
-		
-		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;   
-		
+
+		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;
+
 		// Appel de le méthode pour établir la connexion avec le SGBD 
 		connexion = connexionBDD(username , motDePasse , uri ) ;
 
