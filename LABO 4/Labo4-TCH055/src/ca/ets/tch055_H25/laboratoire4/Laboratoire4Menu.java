@@ -1,5 +1,6 @@
 package ca.ets.tch055_H25.laboratoire4;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -56,44 +57,17 @@ public class Laboratoire4Menu {
     public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
 	    Class.forName("oracle.jdbc.driver.OracleDriver");
     	Connection une_connexion = DriverManager.getConnection(uri, login, password);
-    	return une_connexion  ; 
+    	return une_connexion  ;
     }
     
     /**
      *  Option 1 - lister les produits 
      * @throws SQLException 
      */
-    public static void listerProduits(Connection connJdbc) {
-	try{
-	Statement requete = connJdbc.createStatement();
-		ResultSet resultats = requete.executeQuery(
-			"SELECT * FROM Produit ORDER BY ref_produit ASC"
-		);
-		System.out.println("--------------------------------------------------------------------------------------------");
-		System.out.printf("%-10s %-15s %-15s %-15s %-10s %-8s %-10s %-10s\n",
-				"Référence", "NOM", "MARQUE", "Prix Unitaire", "Quantité", "Seuil", "Statut", "Code four.");
-		System.out.println("--------------------------------------------------------------------------------------------");
-
-		while (resultats.next()) {
-			String ref = resultats.getString("ref_produit");
-			String nom = resultats.getString("nom_produit");
-			String marque = resultats.getString("marque");
-			double prix = resultats.getDouble("prix_unitaire");
-			int quantite = resultats.getInt("quantite_stock");
-			int seuil = resultats.getInt("quantite_seuil");
-			String statut = resultats.getString("statut_produit");
-			int codeFournisseur = resultats.getInt("code_fournisseur_prioritaire");
-
-			System.out.printf("%-10s %-15s %-15s %-15.1f %-10d %-8d %-10s %-10d\n",
-					ref, nom, marque, prix, quantite, seuil, statut, codeFournisseur);
-		}
-		System.out.println("--------------------------------------------------------------------------------------------");
-		System.out.println("Appuyer sur ENTER pour continuer...");
-		new java.util.Scanner(System.in).nextLine();
-	}catch (SQLException e){
-		System.out.println(e);
-    	System.out.println("Option 1 : listerProduits() n'est pas implémentée");
-	}
+    public static void listerProduits() {
+    	// Ligne suivante à supprimer après implémentation
+    	System.out.println("Option 1 : listerProduits() n'est pas implémentée");  
+    	
     }
     
     /**
@@ -159,9 +133,44 @@ public class Laboratoire4Menu {
      * @param numCommande : numéro de la commande à afficher 
      * 
      */
-    public static void afficherCommande(int numCommande) { 
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 3 : afficherCommande() n'est pas implémentée");    	
+    public static void afficherCommande(int numCommande) throws SQLException {
+		Scanner sc = new Scanner(System.in);
+		float montantTotal = 0;
+		//Section client/commande
+		PreparedStatement requeteCommande = connexion.prepareStatement(
+				"SELECT * FROM Client c " +
+						"JOIN Commande co ON c.no_client=co.no_client " +
+						"WHERE no_commande=?");
+		requeteCommande.setInt( 1, numCommande);
+		ResultSet resultCommande = requeteCommande.executeQuery();
+		while(resultCommande.next()) {
+			System.out.println("Client	    : " + resultCommande.getString("prenom") + " " + resultCommande.getString("nom") + "\n" +
+					"Téléphone   : " + resultCommande.getString("telephone") + "\n" +
+					"No Commande : " + String.valueOf(resultCommande.getInt("no_commande")) + "\n" +
+					"Date        : " + resultCommande.getDate("date_commande") + "\n" +
+					"Statut      : " + resultCommande.getString("statut") + "\n" +
+					"----------------------------------------------------------------------------------------\n" +
+					"Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
+					"----------------------------------------------------------------------------------------");
+		}
+
+		//Section produits
+		PreparedStatement requeteProduit = connexion.prepareStatement(
+				"SELECT * FROM Commande_Produit cp " +
+						"JOIN Produit p ON p.ref_produit=cp.no_produit " +
+						"WHERE no_commande=?");
+		requeteProduit.setInt( 1, numCommande);
+		ResultSet resultProduit = requeteProduit.executeQuery();
+		while(resultProduit.next()) {
+			montantTotal += (float)(resultProduit.getInt("quantite_cmd") * resultProduit.getInt("prix_unitaire"));
+			System.out.printf("%-12s %-12s %-11.2s %8.2f %9.2f %13.2f %14.2f\n",
+					resultProduit.getString("ref_produit"), resultProduit.getString("nom_produit"), resultProduit.getString("marque"), (float)resultProduit.getInt("prix_unitaire"), (float)resultProduit.getInt("quantite_cmd"), (float)resultProduit.getInt("quantite_stock"), (float)(resultProduit.getInt("quantite_cmd") * resultProduit.getInt("prix_unitaire")));
+		}
+		System.out.println("----------------------------------------------------------------------------------------");
+
+		System.out.println("Total commande :   " + montantTotal + "  $");
+		System.out.println("Appuyer sur ENTER pour continuer...");
+		sc.nextLine();
     }   
 
     /**
@@ -276,10 +285,10 @@ public class Laboratoire4Menu {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException{
 		
 		// Mettre les informations de votre compte sur SGBD Oracle 
-		String username = "tp4" ;
-		String motDePasse = "tp4" ;
+		String username = "tpbd4" ;
+		String motDePasse = "tpbd4" ;
 		
-		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;
+		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;   
 		
 		// Appel de le méthode pour établir la connexion avec le SGBD 
 		connexion = connexionBDD(username , motDePasse , uri ) ;
@@ -298,7 +307,7 @@ public class Laboratoire4Menu {
            	
                 if(choix.equals("1")){
  
-                    listerProduits(connexion) ;
+                    listerProduits() ; 
                     
                  }else if(choix.equals("2")){
  
