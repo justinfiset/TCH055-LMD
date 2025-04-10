@@ -375,14 +375,14 @@ public class Laboratoire4Menu {
 
 			// FIn de la boucle While - Fermeture de la connexion
 			if(fermetureConnexion()){
-				System.out.println("Deconnection reussie...");
+				System.out.println("Déconnexion réussie...");
 			} else {
 				System.out.println("Échec ou Erreur lors de le déconnexion...");
 			}
 
 		} else {  // if (connexion != null) {
 
-			System.out.println("Echec de la Connection. Au revoir ! ");
+			System.out.println("Échec de la Connection. Au revoir ! ");
 
 		} // if (connexion != null) {
 	} // main() 
