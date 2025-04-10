@@ -1,5 +1,6 @@
 package ca.ets.tch055_H25.laboratoire4;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -55,8 +56,8 @@ public class Laboratoire4Menu {
 	 */
     public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
 	    Class.forName("oracle.jdbc.driver.OracleDriver");
-    	Connection une_connexion = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "tp4", "tp4");
-    	return une_connexion  ; 
+    	Connection une_connexion = DriverManager.getConnection(uri, login, password);
+    	return une_connexion  ;
     }
     
     /**
@@ -132,9 +133,24 @@ public class Laboratoire4Menu {
      * @param numCommande : numéro de la commande à afficher 
      * 
      */
-    public static void afficherCommande(int numCommande) { 
+    public static void afficherCommande(int numCommande) throws SQLException {
     	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 3 : afficherCommande() n'est pas implémentée");    	
+    	System.out.println("Option 3 : afficherCommande() n'est pas implémentée");
+		PreparedStatement requete = connexion.prepareStatement(
+				"SELECT * FROM Client c " +
+						"JOIN Commande co ON c.no_client=co.no_client " +
+						"WHERE no_commande=?");
+		requete.setInt( 1, numCommande);
+		ResultSet result = requete.executeQuery();
+		System.out.println("Client	    : " + result.getString("prenom") + result.getString("nom") + "\n" +
+						   "Téléphone   : " + result.getString("telephone") + "\n" +
+						   "No Commande : " + String.valueOf(result.getInt("no_commande")) + "\n" +
+						   "Date        : " + result.getDate("date_commande") + "\n" +
+						   "Statut      : " + result.getString("statut") + "\n" +
+						   "----------------------------------------------------------------------------------------\n" +
+						   "Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
+						   "----------------------------------------------------------------------------------------");
+		//Ajouter liste produits
     }   
 
     /**
@@ -249,8 +265,8 @@ public class Laboratoire4Menu {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException{
 		
 		// Mettre les informations de votre compte sur SGBD Oracle 
-		String username = "LE_VOTRE" ; 
-		String motDePasse = "LE_VOTRE" ;
+		String username = "tpbd4" ;
+		String motDePasse = "tpbd4" ;
 		
 		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;   
 		
