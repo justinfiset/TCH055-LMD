@@ -63,10 +63,36 @@ public class Laboratoire4Menu {
      *  Option 1 - lister les produits 
      * @throws SQLException 
      */
-    public static void listerProduits() {
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 1 : listerProduits() n'est pas implémentée");  
-    	
+    public static void listerProduits(Connection connJdbc) {
+	try{
+	Statement requete = connJdbc.createStatement();
+		System.out.println("--------------------------------------------------------------------");
+		System.out.print("Référence");
+		System.out.print("NOM");
+		System.out.print("MARQUE");
+		System.out.print("Prix Unitaire");
+		System.out.print("Quantité");
+		System.out.print("Seuil");
+		System.out.print("Statue");
+		System.out.println("Code fournisseur");
+		System.out.println("--------------------------------------------------------------------");
+		ResultSet resultats = requete.executeQuery(
+			"SELECT * FROM Produit"
+		);
+		while(resultats.next()){
+			System.out.println(resultats.getString("ref_produit"));
+			System.out.print(resultats.getString("nom_produit"));
+			System.out.print(resultats.getString("marque"));
+			System.out.print(resultats.getInt("prix_unitaire"));
+			System.out.print(resultats.getInt("quantite_stock"));
+			System.out.print(resultats.getInt("quantite_seuil"));
+			System.out.print(resultats.getString("statue_produit"));
+			System.out.print(resultats.getInt("code_fournisseur_prioritaire"));
+		}
+	}catch (SQLException e){
+		System.out.println(e);
+    	System.out.println("Option 1 : listerProduits() n'est pas implémentée");
+	}
     }
     
     /**
@@ -249,8 +275,8 @@ public class Laboratoire4Menu {
 	public static void main(String args[]) throws ClassNotFoundException, SQLException{
 		
 		// Mettre les informations de votre compte sur SGBD Oracle 
-		String username = "LE_VOTRE" ; 
-		String motDePasse = "LE_VOTRE" ;
+		String username = "Nikola" ;
+		String motDePasse = "jB516413" ;
 		
 		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;   
 		
