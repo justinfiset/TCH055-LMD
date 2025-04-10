@@ -345,7 +345,7 @@ public class Laboratoire4Menu {
 					String typeCarte = sc.nextLine();
 
 					request = connexion.prepareStatement(
-							"INSERT INTO Paiement (date_paiement, montant, type_paiement, no_carte_credit, date_creation, type_carte_credit, id_facture)" +
+							"INSERT INTO Paiement (date_paiement, montant, type_paiement, no_carte_credit, date_expiration , type_carte_credit, id_facture)" +
 									"VALUES (?, ?, ?, ?, ?, ?, ?)"
 					);
 					request.setDate(1, new java.sql.Date(System.currentTimeMillis()));
