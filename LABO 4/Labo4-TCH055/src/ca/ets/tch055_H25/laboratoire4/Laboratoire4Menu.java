@@ -134,23 +134,43 @@ public class Laboratoire4Menu {
      * 
      */
     public static void afficherCommande(int numCommande) throws SQLException {
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 3 : afficherCommande() n'est pas implémentée");
-		PreparedStatement requete = connexion.prepareStatement(
+		Scanner sc = new Scanner(System.in);
+		float montantTotal = 0;
+		//Section client/commande
+		PreparedStatement requeteCommande = connexion.prepareStatement(
 				"SELECT * FROM Client c " +
 						"JOIN Commande co ON c.no_client=co.no_client " +
 						"WHERE no_commande=?");
-		requete.setInt( 1, numCommande);
-		ResultSet result = requete.executeQuery();
-		System.out.println("Client	    : " + result.getString("prenom") + result.getString("nom") + "\n" +
-						   "Téléphone   : " + result.getString("telephone") + "\n" +
-						   "No Commande : " + String.valueOf(result.getInt("no_commande")) + "\n" +
-						   "Date        : " + result.getDate("date_commande") + "\n" +
-						   "Statut      : " + result.getString("statut") + "\n" +
-						   "----------------------------------------------------------------------------------------\n" +
-						   "Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
-						   "----------------------------------------------------------------------------------------");
-		//Ajouter liste produits
+		requeteCommande.setInt( 1, numCommande);
+		ResultSet resultCommande = requeteCommande.executeQuery();
+		while(resultCommande.next()) {
+			System.out.println("Client	    : " + resultCommande.getString("prenom") + " " + resultCommande.getString("nom") + "\n" +
+					"Téléphone   : " + resultCommande.getString("telephone") + "\n" +
+					"No Commande : " + String.valueOf(resultCommande.getInt("no_commande")) + "\n" +
+					"Date        : " + resultCommande.getDate("date_commande") + "\n" +
+					"Statut      : " + resultCommande.getString("statut") + "\n" +
+					"----------------------------------------------------------------------------------------\n" +
+					"Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
+					"----------------------------------------------------------------------------------------");
+		}
+
+		//Section produits
+		PreparedStatement requeteProduit = connexion.prepareStatement(
+				"SELECT * FROM Commande_Produit cp " +
+						"JOIN Produit p ON p.ref_produit=cp.no_produit " +
+						"WHERE no_commande=?");
+		requeteProduit.setInt( 1, numCommande);
+		ResultSet resultProduit = requeteProduit.executeQuery();
+		while(resultProduit.next()) {
+			montantTotal += (float)(resultProduit.getInt("quantite_cmd") * resultProduit.getInt("prix_unitaire"));
+			System.out.printf("%-12s %-12s %-11.2s %8.2f %9.2f %13.2f %14.2f\n",
+					resultProduit.getString("ref_produit"), resultProduit.getString("nom_produit"), resultProduit.getString("marque"), (float)resultProduit.getInt("prix_unitaire"), (float)resultProduit.getInt("quantite_cmd"), (float)resultProduit.getInt("quantite_stock"), (float)(resultProduit.getInt("quantite_cmd") * resultProduit.getInt("prix_unitaire")));
+		}
+		System.out.println("----------------------------------------------------------------------------------------");
+
+		System.out.println("Total commande :   " + montantTotal + "  $");
+		System.out.println("Appuyer sur ENTER pour continuer...");
+		sc.nextLine();
     }   
 
     /**
