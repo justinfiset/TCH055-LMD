@@ -29,52 +29,52 @@ import java.util.Scanner;
  *
  */
 public class Laboratoire4Menu {
-	
+
 	public static Statement statmnt = null;
-	
-	/* Référence vers l'objer de connection à la BD*/ 
+
+	/* Référence vers l'objer de connection à la BD*/
 	public static Connection connexion = null;
-	
-	/* Chargement du pilote Oracle */ 
+
+	/* Chargement du pilote Oracle */
 	static {
-	   try {
-		   Class.forName("oracle.jdbc.driver.OracleDriver");
-	   } catch (ClassNotFoundException e) {
-		
-		   e.printStackTrace();
-	   }
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		} catch (ClassNotFoundException e) {
+
+			e.printStackTrace();
+		}
 	}
-	
+
 	/**
 	 * Question : Ouverture de la connection
-	 * 
+	 *
 	 * @param login
 	 * @param password
 	 * @param uri
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
-    public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
-	    Class.forName("oracle.jdbc.driver.OracleDriver");
-    	Connection une_connexion = DriverManager.getConnection(uri, login, password);
-    	return une_connexion  ;
-    }
-    
-    /**
-     *  Option 1 - lister les produits 
-     * @throws SQLException 
-     */
-    public static void listerProduits() {
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 1 : listerProduits() n'est pas implémentée");  
-    	
-    }
-    
-    /**
-     *  Option 2 - Ajouter un produit
-     *   
-     */
-    public static void ajouterProduit() {
+	public static Connection connexionBDD(String login, String password, String uri) throws SQLException, ClassNotFoundException {
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection une_connexion = DriverManager.getConnection(uri, login, password);
+		return une_connexion  ;
+	}
+
+	/**
+	 *  Option 1 - lister les produits
+	 * @throws SQLException
+	 */
+	public static void listerProduits() {
+		// Ligne suivante à supprimer après implémentation
+		System.out.println("Option 1 : listerProduits() n'est pas implémentée");
+
+	}
+
+	/**
+	 *  Option 2 - Ajouter un produit
+	 *
+	 */
+	public static void ajouterProduit() {
 		Scanner sc = new Scanner(System.in);
 
 		try {
@@ -134,47 +134,67 @@ public class Laboratoire4Menu {
      * 
      */
     public static void afficherCommande(int numCommande) throws SQLException {
-    	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 3 : afficherCommande() n'est pas implémentée");
-		PreparedStatement requete = connexion.prepareStatement(
+		Scanner sc = new Scanner(System.in);
+		float montantTotal = 0;
+		//Section client/commande
+		PreparedStatement requeteCommande = connexion.prepareStatement(
 				"SELECT * FROM Client c " +
 						"JOIN Commande co ON c.no_client=co.no_client " +
 						"WHERE no_commande=?");
-		requete.setInt( 1, numCommande);
-		ResultSet result = requete.executeQuery();
-		System.out.println("Client	    : " + result.getString("prenom") + result.getString("nom") + "\n" +
-						   "Téléphone   : " + result.getString("telephone") + "\n" +
-						   "No Commande : " + String.valueOf(result.getInt("no_commande")) + "\n" +
-						   "Date        : " + result.getDate("date_commande") + "\n" +
-						   "Statut      : " + result.getString("statut") + "\n" +
-						   "----------------------------------------------------------------------------------------\n" +
-						   "Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
-						   "----------------------------------------------------------------------------------------");
-		//Ajouter liste produits
+		requeteCommande.setInt( 1, numCommande);
+		ResultSet resultCommande = requeteCommande.executeQuery();
+		while(resultCommande.next()) {
+			System.out.println("Client	    : " + resultCommande.getString("prenom") + " " + resultCommande.getString("nom") + "\n" +
+					"Téléphone   : " + resultCommande.getString("telephone") + "\n" +
+					"No Commande : " + String.valueOf(resultCommande.getInt("no_commande")) + "\n" +
+					"Date        : " + resultCommande.getDate("date_commande") + "\n" +
+					"Statut      : " + resultCommande.getString("statut") + "\n" +
+					"----------------------------------------------------------------------------------------\n" +
+					"Ref Produit  Nom          Marque       Prix         Q.Commandée  Q.Stock      T.Partiel\n" +
+					"----------------------------------------------------------------------------------------");
+		}
+
+		//Section produits
+		PreparedStatement requeteProduit = connexion.prepareStatement(
+				"SELECT * FROM Commande_Produit cp " +
+						"JOIN Produit p ON p.ref_produit=cp.no_produit " +
+						"WHERE no_commande=?");
+		requeteProduit.setInt( 1, numCommande);
+		ResultSet resultProduit = requeteProduit.executeQuery();
+		while(resultProduit.next()) {
+			montantTotal += (float)(resultProduit.getInt("quantite_cmd") * resultProduit.getInt("prix_unitaire"));
+			System.out.printf("%-12s %-12s %-11.2s %8.2f %9.2f %13.2f %14.2f\n",
+					resultProduit.getString("ref_produit"), resultProduit.getString("nom_produit"), resultProduit.getString("marque"), (float)resultProduit.getInt("prix_unitaire"), (float)resultProduit.getInt("quantite_cmd"), (float)resultProduit.getInt("quantite_stock"), (float)(resultProduit.getInt("quantite_cmd") * resultProduit.getInt("prix_unitaire")));
+		}
+		System.out.println("----------------------------------------------------------------------------------------");
+
+		System.out.println("Total commande :   " + montantTotal + "  $");
+		System.out.println("Appuyer sur ENTER pour continuer...");
+		sc.nextLine();
     }   
 
     /**
      * Option 4 : Calcule le total des paiements effectués pour une facture
-     *   
+     *
      * @param numFacture : numéro de la facture
      * @param affichage  : si false, la méthode ne fait aucun affichage ni arrêt
-     * 
+     *
      */
     public static float calculerPaiements(int numFacture , boolean affichage) {
-    	float resultat = -1 ;     	
+    	float resultat = -1 ;
 
     	// Ligne suivante à supprimer après implémentation
     	System.out.println("Option 4 : calculerPaiements() n'est pas implémentée");
-    	
-    	return resultat ; 
+
+    	return resultat ;
     }
 
-    /** 
-     * Option 5 -  Enregistrer un paiement 
-     * Ajoute un paiement pour une facture 
-     *  
+    /**
+     * Option 5 -  Enregistrer un paiement
+     * Ajoute un paiement pour une facture
+     *
      * @param numFacture : numéro de la facture pour laquelle est fait le paiement
-     * 
+     *
      */
     public static void enregistrerPaiement(int numFacture) {
 		// TODO vérifier si la facture existe, afficher un message
@@ -199,27 +219,76 @@ public class Laboratoire4Menu {
 			case "CREDIT":
 				break;
 		}
-    }
-
-    /**
-     * 
-     *  
-     */
-    
-    /**
-     * Option 6 : enregistre une liste d'évalutions dans la BD. Les données d'une évaluation sont des objets 
-     * 			   SatisfactionData. 
-     * 
-     * @param listEvaluation : tableau d'objet StatisfactionData, contient les données des évaluations 
-     * 						   du client à insérer dans la BD
-     */
-    public static void enregistreEvaluation(SatisfactionData[] listEvaluation) {
+    public static void enregistrerPaiement(int numFacture) {
     	// Ligne suivante à supprimer après implémentation
-    	System.out.println("Option 6 : enregistreEvaluation() n'est pas implémentée");
+    	System.out.println("Option 5 : enregistrerPaiement() n'est pas implémentée");
     }
 
+	/**
+	 *
+	 *
+	 */
+
+	/**
+	 * Option 6 : enregistre une liste d'évalutions dans la BD. Les données d'une évaluation sont des objets
+	 * 			   SatisfactionData.
+	 *
+	 * @param listEvaluation : tableau d'objet StatisfactionData, contient les données des évaluations
+	 * 						   du client à insérer dans la BD
+	 */
+	public static void enregistreEvaluation(SatisfactionData[] listEvaluation) {
+		try{
+
+			PreparedStatement evalExistant = connexion.prepareStatement("SELECT * FROM Satisfaction WHERE no_client = ? AND ref_produit = ? AND note= ? AND  commentaire = ?");
+			PreparedStatement requete = connexion.prepareStatement("INSERT INTO Satisfaction (no_client,ref_produit,note,commentaire) VALUES (?,?,?,?)");
+			PreparedStatement verifieNoClient = connexion.prepareStatement("SELECT * FROM Client WHERE no_client = ?");
+			PreparedStatement verifieRefProduit = connexion.prepareStatement("SELECT * FROM Produit WHERE ref_produit=?");
+
+			int total =0;
+
+			for (SatisfactionData satisfactionData : listEvaluation) {
+
+				verifieNoClient.setInt(1,satisfactionData.no_client);
+				verifieRefProduit.setString(1,satisfactionData.ref_produit);
+				ResultSet resultVerif1 = verifieNoClient.executeQuery();
+				ResultSet resultVerif2 = verifieRefProduit.executeQuery();
+
+				if (resultVerif1.next() && resultVerif2.next()) {
+
+					evalExistant.setInt(1,satisfactionData.no_client);
+					evalExistant.setString(2,satisfactionData.ref_produit);
+					evalExistant.setInt(3,satisfactionData.note);
+					evalExistant.setString(4,satisfactionData.commentaire);
+					ResultSet result = evalExistant.executeQuery();
+
+					if(!result.next()) {
+
+						requete.setInt(1,satisfactionData.no_client);
+						requete.setString(2,satisfactionData.ref_produit);
+						requete.setInt(3,satisfactionData.note);
+						requete.setString(4,satisfactionData.commentaire);
+						total=+1;
+						requete.addBatch();
+					}
+				}
+
+			}
+
+			requete.executeBatch();
+
+
+			System.out.printf("Le nombre d'insertion d'évaluation produit réussi est de %d.\n\n",total);
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage() +'\n'+ e.getCause());
+		}
+
+
+
+	}
+
     /**
-     * Question 9 - fermeture de la connexion   
+     * Question 9 - fermeture de la connexion
      * @return
      */
     public static boolean fermetureConnexion() {
@@ -232,34 +301,34 @@ public class Laboratoire4Menu {
 			System.out.println("Erreur lors de la fermeture de connexion : " + e.getMessage());
 		}
 
-    	return resultat ; 
+    	return resultat ;
     }
 
     // ==============================================================================
-    // NE PAS MODIFIER LE CODE QUI VA SUIVRE 
-    // ==============================================================================    
+    // NE PAS MODIFIER LE CODE QUI VA SUIVRE
+    // ==============================================================================
     /**
-     * Crée et retourne un tableau qui contient 5 évaluations de produits 
+     * Crée et retourne un tableau qui contient 5 évaluations de produits
      * Chaque évaluation est stockée dans un objet de la classe SatisfactionData
-     * 
+     *
      * @return un tableau d'objets SatisfactionData
      */
 	public static SatisfactionData[] listSatisfactionData() {
-			
-		SatisfactionData[] list = new SatisfactionData[5]; 
-		
+
+		SatisfactionData[] list = new SatisfactionData[5];
+
 		list[0] = new SatisfactionData(105 , "PC2000" , 4 , "PC très performant" ) ;
 		list[1] = new SatisfactionData(105 , "LT2011" , 3 , "Produit satisfaisant, un peu bruyant" ) ;
 		list[2] = new SatisfactionData(103 , "PC2000" , 5 , "Excellent ordinateur" ) ;
 		list[3] = new SatisfactionData(101 , "DD2003" , 2 , "Performance moyenne du disque" ) ;
 		list[4] = new SatisfactionData(104 , "SF3001" , 4 , "Je suis très satisfait de ma nouvelle version de l'OS" ) ;
-		
+
 		return list ;
 	}
-    /* ------------------------------------------------------------------------- */      
+    /* ------------------------------------------------------------------------- */
     /**
-     * Affiche un menu pour le choix des opérations 
-     * 
+     * Affiche un menu pour le choix des opérations
+     *
      */
     public static void afficheMenu(){
         System.out.println("0. Quitter le programme");
@@ -268,97 +337,97 @@ public class Laboratoire4Menu {
         System.out.println("3. Afficher une commande");
         System.out.println("4. Afficher le montant payé d'une facture");
         System.out.println("5. Enregistrer un paiement");
-        System.out.println("6. Enregistrer les évaluations des clients");   
+        System.out.println("6. Enregistrer les évaluations des clients");
         System.out.println();
         System.out.println("Votre choix...");
     }
-    
-    
+
+
 	/**
 	 * La méthode main pour le lancement du programme 
 	 * Il faut mettre les informations d'accès à la BDD  
-	 * 
+	 *
 	 * @param args
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
 	 */
 	public static void main(String args[]) throws ClassNotFoundException, SQLException{
-		
+
 		// Mettre les informations de votre compte sur SGBD Oracle 
-		String username = "tpbd4" ;
-		String motDePasse = "tpbd4" ;
-		
-		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;   
-		
+		String username = "tp4" ;
+		String motDePasse = "tp4" ;
+
+		String uri = "jdbc:oracle:thin:@localhost:1521:xe" ;
+
 		// Appel de le méthode pour établir la connexion avec le SGBD 
 		connexion = connexionBDD(username , motDePasse , uri ) ;
-		
+
 		if (connexion != null) {
-			
+
 			System.out.println("Connection reussie...");
-			
+
 			// Affichage du menu pour le choix des opérations 
-			afficheMenu(); 
-             
+			afficheMenu();
+
 			Scanner sc = new Scanner(System.in);
             String choix = sc.nextLine();
-            
+
             while(!choix.equals("0")){
-           	
+
                 if(choix.equals("1")){
- 
-                    listerProduits() ; 
-                    
+
+                    listerProduits() ;
+
                  }else if(choix.equals("2")){
- 
-                	 ajouterProduit() ; 
-                                     
+
+                	 ajouterProduit() ;
+
                  }else if(choix.equals("3")){
- 
+
                     System.out.print("Veuillez saisir le numéro de la commande: ");
                     sc = new Scanner(System.in);
-                    int numCommande = Integer.parseInt(sc.nextLine().trim()) ;              
-                   
-                    afficherCommande(numCommande) ; 
-                    
-                 }else if(choix.equals("4")){
-                	
-                	sc = new Scanner(System.in);
-                	System.out.print("Veuillez saisir le numéro de la facture : ");
-                	int numFacture = Integer.parseInt(sc.nextLine().trim()) ;                                  
-                	calculerPaiements(numFacture , true) ; 
-                                                                           
-                 }else if(choix.equals("5")){
-                	
-                    
-                	System.out.print("Veuillez saisir le numéro de la facture : ");
-                	int numFacture = Integer.parseInt(sc.nextLine().trim()) ;      
-                	sc = new Scanner(System.in);
-                	enregistrerPaiement(numFacture) ; 
+                    int numCommande = Integer.parseInt(sc.nextLine().trim()) ;
 
-                 }else if(choix.equals("6")){                    
+                    afficherCommande(numCommande) ;
+
+                 }else if(choix.equals("4")){
+
+                	sc = new Scanner(System.in);
+                	System.out.print("Veuillez saisir le numéro de la facture : ");
+                	int numFacture = Integer.parseInt(sc.nextLine().trim()) ;
+                	calculerPaiements(numFacture , true) ;
+
+                 }else if(choix.equals("5")){
+
+
+                	System.out.print("Veuillez saisir le numéro de la facture : ");
+                	int numFacture = Integer.parseInt(sc.nextLine().trim()) ;
+                	sc = new Scanner(System.in);
+                	enregistrerPaiement(numFacture) ;
+
+                 }else if(choix.equals("6")){
                 	 enregistreEvaluation(listSatisfactionData());
-                	 
+
                  }
 
                 afficheMenu();
                 sc = new Scanner(System.in);
                 choix = sc.nextLine();
-            	
-            } // while 
 
-            // FIn de la boucle While - Fermeture de la connexion 
-            if(fermetureConnexion()){
-                System.out.println("Deconnection reussie...");
-            } else {
-                System.out.println("Échec ou Erreur lors de le déconnexion...");
-            }
-            
-		 } else {  // if (connexion != null) {
-			 
-			 System.out.println("Echec de la Connection. Au revoir ! ");
-			 
-		 } // if (connexion != null) {	        
+            } // while
+
+			// FIn de la boucle While - Fermeture de la connexion
+			if(fermetureConnexion()){
+				System.out.println("Déconnexion réussie...");
+			} else {
+				System.out.println("Échec ou Erreur lors de le déconnexion...");
+			}
+
+		} else {  // if (connexion != null) {
+
+			System.out.println("Échec de la Connection. Au revoir ! ");
+
+		} // if (connexion != null) {
 	} // main() 
 }
 
@@ -366,23 +435,23 @@ public class Laboratoire4Menu {
 // =============================================================================================
 /**
  * Contient les données d'une évaluation d'un produit 
- * 
+ *
 * @author Pamella Kissok
  * @author Inoussa Legrene
  * @author Amal Ben Abdellah
- * 
+ *
  * @version 2
  */
 class SatisfactionData
 {
 	 int no_client ;
 	String ref_produit ;
-	int note ; 
-	String commentaire ; 
-	
+	int note ;
+	String commentaire ;
+
 	/**
 	 * Constructeur
-	 * 
+	 *
 	 * @param no_client
 	 * @param ref_produit
 	 * @param note
@@ -394,5 +463,5 @@ class SatisfactionData
 		this.ref_produit = ref_produit;
 		this.note = note;
 		this.commentaire = commentaire;
-	}	
+	}
 }
